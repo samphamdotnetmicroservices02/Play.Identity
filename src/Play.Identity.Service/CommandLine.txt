@@ -1,0 +1,34 @@
+//Install Microsoft.EntityFrameworkCore.Design,  
+Microsoft.EntityFrameworkCore.SqlServer, 
+and Microsoft.EntityFrameworkCore.Tools 
+and remove it when already run dotnet aspnet-codegenerator identity --files "Account.Register" and "Account.Logout" because we use MongoDb
+
+
+//Generate template for UI Identity
+//Stand at Play.Identity
+dotnet tool install -g dotnet-aspnet-codegenerator --version 7.0.9
+
+//Stand at src/Play.Identity.Service
+dotnet aspnet-codegenerator identity --files "Account.Register"
+dotnet aspnet-codegenerator identity --files "Account.Logout"
+
+//Stand at src/Play.Identity.Service
+//create secretId
+dotnet user-secrets init
+
+//set password with IdentitySettings:AdminUserPassword with format by appsettings.json
+dotnet user-secrets set "IdentitySettings:AdminUserPassword" "Pass@word1"
+
+// check data on user-secrets
+dotnet user-secrets list
+
+//clear data on user-secrets
+dotnet user-secrets remove "Movies:ConnectionString"
+or
+dotnet user-secrets clear
+
+Install Microsoft.EntityFrameworkCore.Design and Microsoft.EntityFrameworkCore.SqlServer due to generate Logout page
+dotnet aspnet-codegenerator identity --files "Account.Logout"
+
+//pack Play.Identity.Contracts
+dotnet pack -p:PackageVersion=1.0.1 -o ../../../packages/
