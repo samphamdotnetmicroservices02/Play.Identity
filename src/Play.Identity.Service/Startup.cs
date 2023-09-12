@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using GreenPipes;
 using Microsoft.AspNetCore.Builder;
@@ -51,8 +53,8 @@ namespace Play.Identity.Service
                     mongoDbSettings.ConnectionString,
                     serviceSettings.ServiceName
                 );
-                
-            services.AddMassTransitWithRabbitMq(retryConfigurator => 
+
+            services.AddMassTransitWithRabbitMq(retryConfigurator =>
             {
                 retryConfigurator.Interval(3, TimeSpan.FromSeconds(5));
                 retryConfigurator.Ignore(typeof(InsufficientFundsException));
@@ -66,6 +68,10 @@ namespace Play.Identity.Service
                     options.Events.RaiseSuccessEvents = true;
                     options.Events.RaiseFailureEvents = true;
                     options.Events.RaiseErrorEvents = true;
+
+                    //This is required in the Docker environment since the strict Linus permissions you'll set there won't allow IdentityServer to crea keys in
+                    //the default /keys directory
+                    options.KeyManagement.KeyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
                 })
                 .AddAspNetIdentity<ApplicationUser>()
                 .AddInMemoryApiScopes(identityServerSettings.ApiScopes)
@@ -113,6 +119,11 @@ namespace Play.Identity.Service
             app.UseIdentityServer();
 
             app.UseAuthorization();
+
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Lax
+            });
 
             app.UseEndpoints(endpoints =>
             {
