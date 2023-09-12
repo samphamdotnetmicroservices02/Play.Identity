@@ -1,4 +1,4 @@
-# mcr.microsoft.com/dotnet/aspnet:7.0 AS base: this line is actually tealling us what is going to be our base image to go from
+# mcr.microsoft.com/dotnet/aspnet:7.0 AS base: this line is actually telling us what is going to be our base image to go from
 # to execute microservice. That based image, which is in this case project by Microsoft and stored at this mcr.microsoft.com
 # location has everything that you need to run any aspnet core application based on aspnet core 7
 # By just using this line here, we are making sure that the entire envionment for our microservice is already set correctly
@@ -26,6 +26,14 @@ COPY ["src/Play.Identity.Contracts/Play.Identity.Contracts.csproj", "src/Play.Id
 # So we have to copy the project file because we need to build it on that.
 COPY ["src/Play.Identity.Service/Play.Identity.Service.csproj", "src/Play.Identity.Service/"]
 
+# $onwer and $gh_pat are not known at this file, so we have to provide still those variables into this file somehow.
+# So what we're going to do is we're going to be passing in secrets into this file, there are going to be a specified when we
+# do the Docker build command in the next lesson. But here we have to receive them and somehow pass them into this line.
+# So what we're going to do is we do a mounting, so we're going to be mounting a couple of secrets into this Docker image
+# by running commands.
+RUN --mount=type=secret,id=GH_OWNER,dst=/GH_OWNER --mount=type=secret,id=GH_PAT,dst=/GH_PAT \
+    dotnet nuget add source --username USERNAME --password `cat /GH_PAT` --store-password-in-clear-text --name github "https://nuget.pkg.github.com/`cat /GH_OWNER`/index.json"
+
 RUN dotnet restore "src/Play.Identity.Service/Play.Identity.Service.csproj"
 
 # Copy all the other files. We do this because like I said, each of these lines represent layers. So one layer is going to be
@@ -36,9 +44,9 @@ RUN dotnet restore "src/Play.Identity.Service/Play.Identity.Service.csproj"
 # becuase there has nothing, any changes, into the file. It will just move on into the copying phase (COPY . .). If you did 
 # not do that and just went ahead and do the build as we have later on (RUN dotnet build "Play.Identity.Service.csproj" -c $configuration -o /app/build)
 # it will not be able to distinguish between the restore section, the copying and the build later (RUN dotnet build ...). It 
-# will not let you cache thos layers properly. So it's good to have this separated.
+# will not let you cache those layers properly. So it's good to have this separated.
 # Here we're saying we copy from dot to dot (COPY . .), what does that mean? The first dot represent your local 
-# machine (your structure project), the second ot represents the root of your docker image. But we don't want to copy
+# machine (your structure project), the second dot represents the root of your docker image. But we don't want to copy
 # from root to root, we take care of inside in src/, we don't care of out side of /src. So we have to make sure that in this
 # copy instruction, we are going to say copy from ./src to ./src. So that way, we end up with an src directory inside the docker
 # image in this build stage
