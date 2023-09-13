@@ -36,7 +36,7 @@ $env:GH_OWNER="samphamdotnetmicroservices02"
 $env:GH_PAT="[PAT HERE]"
 docker build --secret id=GH_OWNER --secret id=GH_PAT -t play.identity:$version .
 
--t is tack, tack is really a human friendly way to identify your Docker image, in this case, in your 
+-t is tag, tag is really a human friendly way to identify your Docker image, in this case, in your 
 box. And it is composed of two parts. The first part is going to be kind of the name of image, and
 the second part is the version that you want to assign to it.
 the "." next to $version is the cecil file , the context for this docker build command, which in this case
@@ -62,9 +62,10 @@ $adminPass="[PASSWORD HERE]"
 $cosmosDbConnString="[CONN STRING HERE]"
 $serviceBusConnString="[CONN STRING HERE]"
 
-docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e ServiceBusSetting__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+docker run -it --rm -p 5002:5002 --name catalog -e MongoDbSettings__Host=mongo -e RabbitMqSettings__Host=rabbitmq --network playinfra_default play.identity:$version
 
 if you do not use MongoDb and RabbitMQ from Play.Infra, you can remove --network playinfra_default
+
 docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e ServiceBusSetting__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e IdentitySettings__AdminUserPassword=$adminPass play.identity:$version
 
 -it: what it does is it creates and kind of an interactive shell, so that you will not able to go back to your
@@ -99,8 +100,9 @@ adminPass="[PASSWORD HERE]"
 cosmosDbConnString="[CONN STRING HERE]"
 serviceBusConnString="[CONN STRING HERE]"
 
-docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e ServiceBusSetting__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+docker run -it --rm -p 5002:5002 --name catalog -e MongoDbSettings__Host=mongo -e RabbitMqSettings__Host=rabbitmq --network playinfra_default play.identity:$version
 
 if you do not use MongoDb and RabbitMQ from Play.Infra, you can remove --network playinfra_default
+
 docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e ServiceBusSetting__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e IdentitySettings__AdminUserPassword=$adminPass play.identity:$version
 ```
