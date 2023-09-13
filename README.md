@@ -1,9 +1,13 @@
 # Play.Identity.Contracts
 Common library used by Play Economy services.
 
+## Clear your link of package on local machine
+dotnet nuget list source (check your name of nuget on your local)
+dotnet nuget remove source [Name of your link of package you want to remove]
+
 ## Create and publish package
 ```powershell
-$version="1.0.1"
+$version="1.0.2"
 $owner="samphamdotnetmicroservices02"
 $gh_pat="[PAT HERE]"
 
@@ -15,7 +19,7 @@ dotnet nuget push ..\packages\Play.Identity.Contracts.$version.nupkg --api-key $
 ```
 
 ```mac
-version="1.0.1"
+version="1.0.2"
 owner="samphamdotnetmicroservices02"
 gh_pat="[PAT HERE]"
 
@@ -55,7 +59,8 @@ docker images
 ## Run the docker image
 ```powershell
 $adminPass="[PASSWORD HERE]"
-docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__Host=mongo -e RabbitMqSettings__Host=rabbitmq -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+$cosmosDbConnString="[CONN STRING HERE]"
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e RabbitMqSettings__Host=rabbitmq -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
 
 -it: what it does is it creates and kind of an interactive shell, so that you will not able to go back to your
 command line until you cancel the execution of these docker run command.
@@ -86,5 +91,6 @@ And lawtly we have to specify the docker image that we want to run (play.identit
 
 ```mac
 adminPass="[PASSWORD HERE]"
-docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__Host=mongo -e RabbitMqSettings__Host=rabbitmq -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+cosmosDbConnString="[CONN STRING HERE]"
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e RabbitMqSettings__Host=rabbitmq -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
 ```
