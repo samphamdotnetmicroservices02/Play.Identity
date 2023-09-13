@@ -7,7 +7,7 @@ dotnet nuget remove source [Name of your link of package you want to remove]
 
 ## Create and publish package
 ```powershell
-$version="1.0.2"
+$version="1.0.3"
 $owner="samphamdotnetmicroservices02"
 $gh_pat="[PAT HERE]"
 
@@ -19,7 +19,7 @@ dotnet nuget push ..\packages\Play.Identity.Contracts.$version.nupkg --api-key $
 ```
 
 ```mac
-version="1.0.2"
+version="1.0.3"
 owner="samphamdotnetmicroservices02"
 gh_pat="[PAT HERE]"
 
@@ -44,7 +44,7 @@ is just going to be ".", this "." represents the current directory
 ```
 
 ```mac
-export GH_OWNER="samphamdotnetmicroservices02" 
+export GH_OWNER="samphamdotnetmicroservices02"
 export GH_PAT="[PAT HERE]"
 docker build --secret id=GH_OWNER --secret id=GH_PAT -t play.identity:$version .
 check this link for more details about env variable on mac
@@ -60,7 +60,12 @@ docker images
 ```powershell
 $adminPass="[PASSWORD HERE]"
 $cosmosDbConnString="[CONN STRING HERE]"
-docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e RabbitMqSettings__Host=rabbitmq -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+$serviceBusConnString="[CONN STRING HERE]"
+
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e ServiceBusSetting__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+
+if you do not use MongoDb and RabbitMQ from Play.Infra, you can remove --network playinfra_default
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e ServiceBusSetting__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e IdentitySettings__AdminUserPassword=$adminPass play.identity:$version
 
 -it: what it does is it creates and kind of an interactive shell, so that you will not able to go back to your
 command line until you cancel the execution of these docker run command.
@@ -92,5 +97,10 @@ And lawtly we have to specify the docker image that we want to run (play.identit
 ```mac
 adminPass="[PASSWORD HERE]"
 cosmosDbConnString="[CONN STRING HERE]"
-docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e RabbitMqSettings__Host=rabbitmq -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+serviceBusConnString="[CONN STRING HERE]"
+
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e ServiceBusSetting__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e IdentitySettings__AdminUserPassword=$adminPass --network playinfra_default play.identity:$version
+
+if you do not use MongoDb and RabbitMQ from Play.Infra, you can remove --network playinfra_default
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__ConnectionString=$cosmosDbConnString -e ServiceBusSetting__ConnectionString=$serviceBusConnString -e ServiceSettings__MessageBroker="SERVICEBUS" -e IdentitySettings__AdminUserPassword=$adminPass play.identity:$version
 ```
