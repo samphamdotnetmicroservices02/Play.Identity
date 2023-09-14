@@ -52,7 +52,14 @@ is just going to be ".", this "." represents the current directory
 ```mac
 export GH_OWNER="samphamdotnetmicroservices02"
 export GH_PAT="[PAT HERE]"
+acrName="samphamplayeconomyacr"
+
 docker build --secret id=GH_OWNER --secret id=GH_PAT -t play.identity:$version .
+
+or
+
+docker build --secret id=GH_OWNER --secret id=GH_PAT -t "$acrName.azurecr.io/play.identity:$version" .
+
 check this link for more details about env variable on mac
 https://phoenixnap.com/kb/set-environment-variable-mac
 ```
