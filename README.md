@@ -62,7 +62,7 @@ $adminPass="[PASSWORD HERE]"
 $cosmosDbConnString="[CONN STRING HERE]"
 $serviceBusConnString="[CONN STRING HERE]"
 
-docker run -it --rm -p 5002:5002 --name catalog -e MongoDbSettings__Host=mongo -e RabbitMqSettings__Host=rabbitmq --network playinfra_default play.identity:$version
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__Host=mongo -e RabbitMqSettings__Host=rabbitmq --network playinfra_default play.identity:$version
 
 if you do not use MongoDb and RabbitMQ from Play.Infra, you can remove --network playinfra_default
 
@@ -100,7 +100,7 @@ adminPass="[PASSWORD HERE]"
 cosmosDbConnString="[CONN STRING HERE]"
 serviceBusConnString="[CONN STRING HERE]"
 
-docker run -it --rm -p 5002:5002 --name catalog -e MongoDbSettings__Host=mongo -e RabbitMqSettings__Host=rabbitmq --network playinfra_default play.identity:$version
+docker run -it --rm -p 5002:5002 --name identity -e MongoDbSettings__Host=mongo -e RabbitMqSettings__Host=rabbitmq --network playinfra_default play.identity:$version
 
 if you do not use MongoDb and RabbitMQ from Play.Infra, you can remove --network playinfra_default
 
