@@ -126,7 +126,6 @@ docker images (check your images for ACR)
 docker push "$acrName.azurecr.io/play.identity:$version" (go to your ACR -> Repositories to check your images)
 
 
-
 az acr login: in order to be able to publish anything into ACR, you will have to first log in into it. Because remember that an ACR is a private repository.
 So people cannot just connect to it from anywhere without providing credentials. It is not a repository like it will be the case in Docker Hub.
 This is private, so you need credentials to be able to access it. So to do that, what you can do is use the AZ ACR login command from Azure CLI
@@ -136,4 +135,17 @@ able to publish these to ACR, you have to have the name of the repository of you
 and the accurate repository name (samphamplayeconomyacr.azurecr.io/play.identity:$version, samphamplayeconomyacr.azurecr.io comes from your login server of ACR)
 
 docker push: publishing image
+```
+
+```mac
+acrName="samphamplayeconomyacr"
+
+az acr login --name $acrName
+
+docker tag play.identity:$version "$acrName.azurecr.io/play.identity:$version"
+
+docker images (check your images for ACR)
+
+docker push "$acrName.azurecr.io/play.identity:$version" (go to your ACR -> Repositories to check your images)
+
 ```
