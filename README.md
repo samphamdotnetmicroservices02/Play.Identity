@@ -185,3 +185,20 @@ and the actual value for the connection string is going to come from the variabl
 
 -n: What is the namespace that we want to create secrets
 ```
+
+## Creating the Kubernetes pod
+```powershell
+kubectl apply -f ./kubernetes/identity.yaml -n $namespace
+
+kubectl get pods -n $namespace
+READY 1/1: means that we have one container inside the pod, and that one pod is ready
+
+kubectl logs identity-deployment-5767558688-p9zh2 -n $namespace
+identity-deployment-5767558688-p9zh2: is the name when you run "kubectl get pods -n $namespace"
+
+kubectl logs ...: You want to know what is going on with that pod, what is happening inside that pod
+
+kubectl describe pod identity-deployment-5767558688-p9zh2 -n $namespace
+
+describe pod: this will give you even more insights into definition of the pod.
+```
