@@ -154,5 +154,34 @@ docker tag play.identity:$version "$acrName.azurecr.io/play.identity:$version"
 docker images (check your images for ACR)
 
 docker push "$acrName.azurecr.io/play.identity:$version" (go to your ACR -> Repositories to check your images)
+```
 
+## Creating the Kubernetes namespace
+```powershell
+$namespace="identity"
+kubectl create namespace $namespace
+
+namespace: the namespace is nothing more than a way to separate the resources that belong to different applications in your Kubernetes cluster. So usallly 
+you will have one namespace paired microservice in this case, we will put all the resources that belong to that specific microservice.
+```
+
+```mac
+namespace="identity"
+kubectl create namespace $namespace
+```
+
+## Creating the Kubernetes secrets
+```powershell
+kubectl create secret generic identity-secrets --from-literal=cosmosdb-connectionstring=$cosmosDbConnString --from-literal=servicebus-connectionstring=$serviceBusConnString --from-literal=admin-password=$adminPass -n $namespace
+
+kubectl get secrets -n $namespace
+
+generic: there are different types of secrets that you can create in coordinators. In our case, we will be creating what we call a generic secret.
+identity-secrets: This is the name of secret object 
+
+--from-literal=cosmosdb-connectionstring=$cosmosDbConnString: since we want to provide the secret values from command line, what we will do is say
+--from-literal, and then euquals and here is where the actual name of the secret value comes in place. So we will name the secret value "cosmosdb-connectionstring"
+and the actual value for the connection string is going to come from the variable "$cosmosDbConnString" that we defined before
+
+-n: What is the namespace that we want to create secrets
 ```
