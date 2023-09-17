@@ -37,15 +37,15 @@ spec:
     spec:
       containers:
         - name: identity
-          image: samphamplayeconomyacr.azurecr.io/play.identity:1.0.3
+          image: samphamplayeconomyacr.azurecr.io/play.identity:1.0.4
           env:
             - name: ServiceSettings__MessageBroker
               value: SERVICEBUS
             - name: MongoDbSettings__ConnectionString
-            # valueFrom where we can use secret values
+              # valueFrom where we can use secret values
               valueFrom:
                 secretKeyRef:
-                # identity-screts is the name of secret you create in Kubernetes, pls check README.
+                  # identity-screts is the name of secret you create in Kubernetes, pls check README.
                   name: identity-secrets
                   key: cosmosdb-connectionstring
             - name: ServiceBusSetting__ConnectionString
@@ -76,6 +76,22 @@ spec:
           ports:
             - containerPort: 5002
 
+          # Kubernetes health probes
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              # what is the port that has to be used to reach that end point
+              port: 5002
+            # this is because your microservice may take a little bit to boot, especially the very first time. And so there's no much of point of Kubernetes
+            # trying to invoke your endpoint if the microservices just getting started, It cannot be respond to any queries yet. I like to give it at least
+            # 10 seconds before the first time, like Kubernetes will start pinging this endpoint to see if the service is alive.
+            initialDelaySeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 5002
+            initialDelaySeconds: 10
+
 # this "---" is the way you can seperate resources within a single yaml file. You can create another file for this service
 ---
 apiVersion: v1
@@ -89,17 +105,17 @@ metadata:
 # that we are going to meet in the definition of our service over here (spec.selector.app below)
 spec:
   # exposing IP to the outside of cluster. If you've declared type LoadBalancer it means that Kubernetes has to reach out to the cloud provider, which is this case
-  # is going to be Azure Kubernetes service and it has to require that somehow Azure creates a public IP for our identity microservice, so that all the people 
+  # is going to be Azure Kubernetes service and it has to require that somehow Azure creates a public IP for our identity microservice, so that all the people
   # can reach out to it
   type: LoadBalancer
   selector:
     app: identity
 
   ports:
-  # this ports is how we're going to expose our service to the outside world. So the first port here is the one that any other port within our cluster can use to
-  # reach out into our identity microservice. And is also the port that will be available if somebody wants to reach out to microservice from the outside. 
-  - port: 80
-  # the targetPort is the port that is behind the service is exposing (5002 comes from ports.containerPort above). So anytime any other port or any other 
-  # application or client wants to reach out to the identity microservice, they will have to do is by using port 80 in whichever the IP we accquired for this
-  # service and the service will go ahead and find any of the ports that match the identity "app" label, and then it will route the request into port 5002
-    targetPort: 5002
+    # this ports is how we're going to expose our service to the outside world. So the first port here is the one that any other port within our cluster can use to
+    # reach out into our identity microservice. And is also the port that will be available if somebody wants to reach out to microservice from the outside.
+    - port: 80
+      # the targetPort is the port that is behind the service is exposing (5002 comes from ports.containerPort above). So anytime any other port or any other
+      # application or client wants to reach out to the identity microservice, they will have to do is by using port 80 in whichever the IP we accquired for this
+      # service and the service will go ahead and find any of the ports that match the identity "app" label, and then it will route the request into port 5002
+      targetPort: 5002
