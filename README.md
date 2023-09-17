@@ -193,6 +193,12 @@ kubectl apply -f ./kubernetes/identity.yaml -n $namespace
 kubectl get pods -n $namespace
 READY 1/1: means that we have one container inside the pod, and that one pod is ready
 
+kubectl get services -n $namespace
+TYPE: ClusterIP is the default type, which is ClusterIP meaning that it gets an IP that is local to the cluster
+(CLISTER-IP), so only any other ports within the cluster can reachout these microservice right now. And it is
+listening in port 80. External-IP needs to define "spec.type: LoadBalancer" in yaml file
+
+
 kubectl logs identity-deployment-5767558688-p9zh2 -n $namespace
 identity-deployment-5767558688-p9zh2: is the name when you run "kubectl get pods -n $namespace"
 
@@ -201,4 +207,11 @@ kubectl logs ...: You want to know what is going on with that pod, what is happe
 kubectl describe pod identity-deployment-5767558688-p9zh2 -n $namespace
 
 describe pod: this will give you even more insights into definition of the pod.
+```
+
+## Measuring specs like CPU, RAM
+```
+kubectl top pods
+
+It will tell you how much CPU and RAM your containers are using in Kubernetes.
 ```

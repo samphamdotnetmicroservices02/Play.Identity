@@ -75,3 +75,31 @@ spec:
           # listening on. And if you don't remember that you can go back to Docker file and the port we're using in dockerfile is 5002 (from ASPNETCORE_URLS=...:5002)
           ports:
             - containerPort: 5002
+
+# this "---" is the way you can seperate resources within a single yaml file. You can create another file for this service
+---
+apiVersion: v1
+kind: Service
+#metadata.name: name of the service
+metadata:
+  name: identity-service
+# spec.selector.app: just like we did with the deployment. in deployment we have to define how to select the port that this deployment is going to manage. In the
+# same way, we have to provide a selector in the service to define which are going to be the ports that this service is going to route a request into. As we know
+# for our ports (spec.template.metadata.labels.app) above, the path template defines the the "app" label with the identity value. So this identity value is the one
+# that we are going to meet in the definition of our service over here (spec.selector.app below)
+spec:
+  # exposing IP to the outside of cluster. If you've declared type LoadBalancer it means that Kubernetes has to reach out to the cloud provider, which is this case
+  # is going to be Azure Kubernetes service and it has to require that somehow Azure creates a public IP for our identity microservice, so that all the people 
+  # can reach out to it
+  type: LoadBalancer
+  selector:
+    app: identity
+
+  ports:
+  # this ports is how we're going to expose our service to the outside world. So the first port here is the one that any other port within our cluster can use to
+  # reach out into our identity microservice. And is also the port that will be available if somebody wants to reach out to microservice from the outside. 
+  - port: 80
+  # the targetPort is the port that is behind the service is exposing (5002 comes from ports.containerPort above). So anytime any other port or any other 
+  # application or client wants to reach out to the identity microservice, they will have to do is by using port 80 in whichever the IP we accquired for this
+  # service and the service will go ahead and find any of the ports that match the identity "app" label, and then it will route the request into port 5002
+    targetPort: 5002
