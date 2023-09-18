@@ -29,12 +29,16 @@ spec:
     metadata:
       labels:
         app: identity
+        # this requires from service account
+        azure.workload.identity/use: "true"
     # Then we keep going down into the spec of our part itself. The first thing we're defining here is the containers. So which are going to be containers that
     # are going to leave within this part. So the "name" that we are going to be assigning to our container is identity, because it's going to be our
     # identity container. Now this name that we saying here has nothing to do with the other container. What really matters is the "image" name that you provide
     # here (spec.containers.image). So what is going to be that image name? Run docker images and you will see your image name acr of identity. This is an image
     # that I'm asking Kubernetes to pull down into this part in the node.
     spec:
+      # associate service account with every port that we create for the identity microservice
+      serviceAccountName: identity-serviceaccount
       containers:
         - name: identity
           image: samphamplayeconomyacr.azurecr.io/play.identity:1.0.4
@@ -119,3 +123,16 @@ spec:
       # application or client wants to reach out to the identity microservice, they will have to do is by using port 80 in whichever the IP we accquired for this
       # service and the service will go ahead and find any of the ports that match the identity "app" label, and then it will route the request into port 5002
       targetPort: 5002
+
+--- 
+#Kubernetes servicea account
+apiVerision: v1
+kind: ServiceAccount
+metadata:
+  # name is the name of service account
+  name: identity-serviceaccount
+  annotations:
+    #client-id is the value comes from "$IDENTITY_CLIENT_ID=az identity show -g $appname -n $namespace --query clientId -otsv" in README file
+    azure.workload.identity/client-id: 85389976-7449-4066-8176-89e472bb343a
+  lables:
+    azure.workload.identity/use: "true"

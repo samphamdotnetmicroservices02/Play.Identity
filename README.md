@@ -219,3 +219,38 @@ kubectl events -n $namespace
 // check events, when deployment is successful, it check a new version service and then kill old pod
 ```
 
+## Creating the Azure Managed Identity and grating it access to Key Vault secrets
+```powershell
+$appname="playeconomy"
+$keyVaultName="samphamplayeconomykv"
+
+az identity create --resource-group $appname --name $namespace
+
+$IDENTITY_CLIENT_ID=az identity show -g $appname -n $namespace --query clientId -otsv
+
+az keyvault set-policy -n $keyVaultName --secret-permissions get list --spn $IDENTITY_CLIENT_ID
+
+check your Azure Managed Identity by navigate to resource group -> $keyVaultName -> AccessPolicies to see the $namespace have permission Get, List. And you can see
+the $namespace in resource group -> $namespace
+
+az identity create: create one of Azure managed identities
+--name: the name of the managed identity.
+
+after run "az identity create ...", we have the "clientId" from the response. What we want to do is to retrieve what is known as the identity clientId,
+which we are gonna be using to assign permissions into our key vault.
+
+az identity show: is a command to retrieve details about a managed identity that we have already created. 
+
+-n from "az identity show -g $appname -n $namespace" is the name of identity
+
+--query clientId: we want to say that we do not want to just query all the details about this identity, we want to the specific property of that identity. So we
+will say query and retrive the clientId
+
+-otsv: we want the "--query clientId" in a format otsv that is easy to parse for other commands.
+
+az keyvault set-policy: after run "$IDENTITY_CLIENT_ID=az identity ...", use the clientId to grant access to our key vault secrets or to our Azure key vault
+-n: the name of key vault
+--secret-persmissions get list --spn $IDENTITY_CLIENT_ID: "--secret-persmissions" states that we are going to be grarting permissions into our key vault secrets. 
+It could be cetificates, it could be keys or it could be secrets. In this case it is going to be just secrets. And the permission we want to grant is "get list".
+"--spn $IDENTITY_CLIENT_ID" And then the identity or the service principle that we want to grant these permissions into, is going to be our identity clientId
+```
