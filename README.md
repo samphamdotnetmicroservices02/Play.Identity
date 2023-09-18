@@ -7,7 +7,7 @@ dotnet nuget remove source [Name of your link of package you want to remove]
 
 ## Create and publish package
 ```powershell
-$version="1.0.4"
+$version="1.0.5"
 $owner="samphamdotnetmicroservices02"
 $gh_pat="[PAT HERE]"
 
@@ -19,7 +19,7 @@ dotnet nuget push ..\packages\Play.Identity.Contracts.$version.nupkg --api-key $
 ```
 
 ```mac
-version="1.0.4"
+version="1.0.5"
 owner="samphamdotnetmicroservices02"
 gh_pat="[PAT HERE]"
 
@@ -218,3 +218,4 @@ It will tell you how much CPU and RAM your containers are using in Kubernetes.
 kubectl events -n $namespace
 // check events, when deployment is successful, it check a new version service and then kill old pod
 ```
+
