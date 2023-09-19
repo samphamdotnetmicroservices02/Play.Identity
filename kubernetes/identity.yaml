@@ -41,27 +41,30 @@ spec:
       serviceAccountName: identity-serviceaccount
       containers:
         - name: identity
-          image: samphamplayeconomyacr.azurecr.io/play.identity:1.0.4
+          image: samphamplayeconomyacr.azurecr.io/play.identity:1.0.5
           env:
             - name: ServiceSettings__MessageBroker
               value: SERVICEBUS
-            - name: MongoDbSettings__ConnectionString
-              # valueFrom where we can use secret values
-              valueFrom:
-                secretKeyRef:
-                  # identity-screts is the name of secret you create in Kubernetes, pls check README.
-                  name: identity-secrets
-                  key: cosmosdb-connectionstring
-            - name: ServiceBusSetting__ConnectionString
-              valueFrom:
-                secretKeyRef:
-                  name: identity-secrets
-                  key: servicebus-connectionstring
-            - name: IdentitySettings__AdminUserPassword
-              valueFrom:
-                secretKeyRef:
-                  name: identity-secrets
-                  key: admin-password
+            
+            # this is the Kubernetes secrets, after we created secret from Key Vault, we no need the Kubernetes secrets
+            # - name: MongoDbSettings__ConnectionString
+            #   # valueFrom where we can use secret values
+            #   valueFrom:
+            #     secretKeyRef:
+            #       # identity-screts is the name of secret you create in Kubernetes, pls check README.
+            #       name: identity-secrets
+            #       key: cosmosdb-connectionstring
+            # - name: ServiceBusSetting__ConnectionString
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: identity-secrets
+            #       key: servicebus-connectionstring
+            # - name: IdentitySettings__AdminUserPassword
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: identity-secrets
+            #       key: admin-password
+            
           # this resources is how you define how many resources can your Kubernetes ports use in the cluster, because you don't want them to go and start taking
           # as many resources available, because you want to make sure that they are constained and the only use as much, in this case, memory and cpu as needed.
           # In this case we are using by default 128 mebibytes. Where one mebibytes is equal to 1024 kibibytes. So similar to megabytes is just that one megabytes

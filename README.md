@@ -176,6 +176,8 @@ kubectl create secret generic identity-secrets --from-literal=cosmosdb-connectio
 
 kubectl get secrets -n $namespace
 
+kubectl delete secret identity-secrets -n $namespace (If you use Azure Key Vault, you do not need Kubernetes secrets, so delete it)
+
 generic: there are different types of secrets that you can create in coordinators. In our case, we will be creating what we call a generic secret.
 identity-secrets: This is the name of secret object 
 
@@ -191,7 +193,10 @@ and the actual value for the connection string is going to come from the variabl
 kubectl apply -f ./kubernetes/identity.yaml -n $namespace
 
 kubectl get pods -n $namespace
+kubectl get pods -n $namespace -w
 READY 1/1: means that we have one container inside the pod, and that one pod is ready
+AGE: is the time your pod run from the past to the current time
+-w: listen to it until a new version deployment is alive.
 
 kubectl get services -n $namespace
 TYPE: ClusterIP is the default type, which is ClusterIP meaning that it gets an IP that is local to the cluster
