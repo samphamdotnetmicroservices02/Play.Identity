@@ -7,7 +7,7 @@ dotnet nuget remove source [Name of your link of package you want to remove]
 
 ## Create and publish package
 ```powershell
-$version="1.0.5"
+$version="1.0.6"
 $owner="samphamdotnetmicroservices02"
 $gh_pat="[PAT HERE]"
 
@@ -19,7 +19,7 @@ dotnet nuget push ..\packages\Play.Identity.Contracts.$version.nupkg --api-key $
 ```
 
 ```mac
-version="1.0.5"
+version="1.0.6"
 owner="samphamdotnetmicroservices02"
 gh_pat="[PAT HERE]"
 
@@ -179,7 +179,7 @@ kubectl get secrets -n $namespace
 kubectl delete secret identity-secrets -n $namespace (If you use Azure Key Vault, you do not need Kubernetes secrets, so delete it)
 
 generic: there are different types of secrets that you can create in coordinators. In our case, we will be creating what we call a generic secret.
-identity-secrets: This is the name of secret object 
+identity-secrets: This is the name of secret object. You can name it any name you want.
 
 --from-literal=cosmosdb-connectionstring=$cosmosDbConnString: since we want to provide the secret values from command line, what we will do is say
 --from-literal, and then euquals and here is where the actual name of the secret value comes in place. So we will name the secret value "cosmosdb-connectionstring"
@@ -200,7 +200,7 @@ AGE: is the time your pod run from the past to the current time
 
 kubectl get services -n $namespace
 TYPE: ClusterIP is the default type, which is ClusterIP meaning that it gets an IP that is local to the cluster
-(CLISTER-IP), so only any other ports within the cluster can reachout these microservice right now. And it is
+(CLUSTER-IP), so only any other ports within the cluster can reachout these microservice right now. And it is
 listening in port 80. External-IP needs to define "spec.type: LoadBalancer" in yaml file
 
 
