@@ -124,9 +124,9 @@ spec:
       # service and the service will go ahead and find any of the ports that match the identity "app" label, and then it will route the request into port 5002
       targetPort: 5002
 
---- 
+---
 #Kubernetes servicea account
-apiVerision: v1
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   # name is the name of service account
@@ -134,5 +134,5 @@ metadata:
   annotations:
     #client-id is the value comes from "$IDENTITY_CLIENT_ID=az identity show -g $appname -n $namespace --query clientId -otsv" in README file
     azure.workload.identity/client-id: 85389976-7449-4066-8176-89e472bb343a
-  lables:
+  labels:
     azure.workload.identity/use: "true"

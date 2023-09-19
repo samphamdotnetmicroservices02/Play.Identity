@@ -220,6 +220,8 @@ kubectl events -n $namespace
 ```
 
 ## Creating the Azure Managed Identity and grating it access to Key Vault secrets
+from https://learn.microsoft.com/en-gb/azure/aks/workload-identity-deploy-cluster
+
 ```powershell
 $appname="playeconomy"
 $keyVaultName="samphamplayeconomykv"
@@ -253,4 +255,33 @@ az keyvault set-policy: after run "$IDENTITY_CLIENT_ID=az identity ...", use the
 --secret-persmissions get list --spn $IDENTITY_CLIENT_ID: "--secret-persmissions" states that we are going to be grarting permissions into our key vault secrets. 
 It could be cetificates, it could be keys or it could be secrets. In this case it is going to be just secrets. And the permission we want to grant is "get list".
 "--spn $IDENTITY_CLIENT_ID" And then the identity or the service principle that we want to grant these permissions into, is going to be our identity clientId
+```
+
+## Establish the federated identity credential
+```powershell
+$aksName="samphamplayeconomyaks"
+
+$AKS_OIDC_ISSUER=az aks show -n $aksName -g $appname --query "oidcIssuerProfile.issuerUrl" -otsv
+
+az identity federated-credential create --name $namespace --identity-name $namespace --resource-group $appname --issuer $AKS_OIDC_ISSUER --subject "system:serviceaccount:${namespace}:${namespace}-serviceaccount" --audience api://AzureADTokenExchange
+
+check your result: navigate your resource group $namespace, in this case is identity (Managed Identity) -> Federated credentials tab
+
+retrieve this oidcIssuerProfile.issuerUrl: the only reason why we are able to query this is because when we created the cluster, if you remember we asked it
+to enable these OIDC issuer at cluster creation time. So you have to do it that way, otherwise it will not work.
+
+az identity federated-credential... --name: the name of our managed identity. So that name in our case is namespace which in my case is "identity". Because it is
+the identity microservice. This is the name of the federated credential
+
+az identity federated-credential... --identity-name: the name of managed identity, the identity name. So for that, we are going to be putting again, namespace.
+This is the name of the managed identity we already created before
+
+az identity federated-credential... --subject: your service account that you just created. 
+"system:serviceaccount:${namespace}:${namespace}-serviceaccount", the first $namespace, general case is just identity, and the second $namespace is the actual name of the service account which lives in kubernetes/identity.yaml and the ${namespace}-serviceaccount lives in $namespace (identity)
+```
+
+```mac
+export AKS_OIDC_ISSUER="$(az aks show -n $aksName -g "${appname}" --query "oidcIssuerProfile.issuerUrl" -otsv)"
+
+az identity federated-credential create --name $namespace --identity-name $namespace --resource-group $appname --issuer $AKS_OIDC_ISSUER --subject "system:serviceaccount:${namespace}:${namespace}-serviceaccount" --audience api://AzureADTokenExchange
 ```
