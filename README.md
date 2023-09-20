@@ -237,6 +237,9 @@ $IDENTITY_CLIENT_ID=az identity show -g $appname -n $namespace --query clientId 
 
 az keyvault set-policy -n $keyVaultName --secret-permissions get list --spn $IDENTITY_CLIENT_ID
 
+if you receive an error like "AADSTS530003: Your device is required to be managed to access this resource."
+after running "az keyvault set-policy ...", try to run it on Cloud
+
 check your Azure Managed Identity by navigate to resource group -> $keyVaultName -> AccessPolicies to see the $namespace have permission Get, List. And you can see
 the $namespace in resource group -> $namespace
 
@@ -260,6 +263,17 @@ az keyvault set-policy: after run "$IDENTITY_CLIENT_ID=az identity ...", use the
 --secret-persmissions get list --spn $IDENTITY_CLIENT_ID: "--secret-persmissions" states that we are going to be grarting permissions into our key vault secrets. 
 It could be cetificates, it could be keys or it could be secrets. In this case it is going to be just secrets. And the permission we want to grant is "get list".
 "--spn $IDENTITY_CLIENT_ID" And then the identity or the service principle that we want to grant these permissions into, is going to be our identity clientId
+```
+
+```mac
+appname="playeconomy"
+keyVaultName="samphamplayeconomykv"
+
+az identity create --resource-group $appname --name $namespace
+
+export IDENTITY_CLIENT_ID="$(az identity show -g $appname -n $namespace --query clientId -otsv)"
+
+az keyvault set-policy -n $keyVaultName --secret-permissions get list --spn $IDENTITY_CLIENT_ID
 ```
 
 ## Establish the federated identity credential
