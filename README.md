@@ -300,6 +300,7 @@ az identity federated-credential... --subject: your service account that you jus
 ```
 
 ```mac
+aksName="samphamplayeconomyaks"
 export AKS_OIDC_ISSUER="$(az aks show -n $aksName -g "${appname}" --query "oidcIssuerProfile.issuerUrl" -otsv)"
 
 az identity federated-credential create --name $namespace --identity-name $namespace --resource-group $appname --issuer $AKS_OIDC_ISSUER --subject "system:serviceaccount:${namespace}:${namespace}-serviceaccount" --audience api://AzureADTokenExchange
