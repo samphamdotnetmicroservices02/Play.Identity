@@ -41,13 +41,16 @@ spec:
       serviceAccountName: identity-serviceaccount
       containers:
         - name: identity
-          image: samphamplayeconomyacr.azurecr.io/play.identity:1.0.6
+          image: samphamplayeconomyacr.azurecr.io/play.identity:1.0.7
           env:
             - name: ServiceSettings__MessageBroker
               value: SERVICEBUS
             - name: ServiceSettings__KeyVaultName
               value: samphamplayeconomykv
 
+            # define path base from api gateway (identity-svc, please check Play.Infra)
+            - name: IdentitySettings__PathBase
+              value: /identity-svc
             # this is the Kubernetes secrets, after we created secret from Key Vault, we no need the Kubernetes secrets
             # - name: MongoDbSettings__ConnectionString
             #   # valueFrom where we can use secret values
@@ -116,7 +119,10 @@ spec:
   # exposing IP to the outside of cluster. If you've declared type LoadBalancer it means that Kubernetes has to reach out to the cloud provider, which is this case
   # is going to be Azure Kubernetes service and it has to require that somehow Azure creates a public IP for our identity microservice, so that all the people
   # can reach out to it
-  type: LoadBalancer
+  # For Api Gateway, we are no longer need LoadBalancer bevause it's public IP, and the public IP will be handled
+  # by Api gateway, so we change it to ClusterIP. But the default is ClusterIP so you can remove this type label. So as I mentioned before, cluster IP just means
+  # that the service gets a local IP within the cluster, but it's not an IP that is public, it's not reachable from outside internet.
+  type: ClusterIP
   selector:
     app: identity
 

@@ -7,7 +7,7 @@ dotnet nuget remove source [Name of your link of package you want to remove]
 
 ## Create and publish package
 ```powershell
-$version="1.0.6"
+$version="1.0.7"
 $owner="samphamdotnetmicroservices02"
 $gh_pat="[PAT HERE]"
 
@@ -19,7 +19,7 @@ dotnet nuget push ..\packages\Play.Identity.Contracts.$version.nupkg --api-key $
 ```
 
 ```mac
-version="1.0.6"
+version="1.0.7"
 owner="samphamdotnetmicroservices02"
 gh_pat="[PAT HERE]"
 

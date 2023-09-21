@@ -5,6 +5,7 @@ using GreenPipes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -110,6 +111,15 @@ namespace Play.Identity.Service
             }
 
             app.UseHttpsRedirection();
+
+            app.Use((context, next) =>
+            {
+                // for identity service can run behind the api gateway
+                var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
+                context.Request.PathBase = new PathString(identitySettings.PathBase);
+
+                return next();
+            });
 
             app.UseStaticFiles();
 
