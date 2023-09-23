@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -92,11 +93,43 @@ namespace Play.Identity.Service
 
             services.AddHealthChecks()
                 .AddMongoDb();
+
+            /*
+            * https://learn.dotnetacademy.io/courses/take/net-microservices-cloud/lessons/38615232-forwarding-headers-to-the-identity-microservice
+            * Let's configure identity microservice, so it can handle HTTPS reuqests coming from the API Gateway. So when you run a service like
+            * the identity service behind the API gateway, there are a couple of headers that you need to make sure that are forwarded from the 
+            * Api Gateway all the way down to you service. If that doesn't happen, then the HTTPS communication is not going to work properly.
+            * let's make sure that we do that header forwarding.
+            */
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                /*
+                * after configure this and app.UseForwardedHeaders(); below. You can use https for Api gateway.
+                * these headers here identifies what is going to be the originating IP address of the client. So when the client like postman, FE calls the
+                * Api gateway, what is the IP address from that client. So that's going to come in this header. And the other header is going to be 
+                * ForwardedHeaders.XForwardedProto. And what that contains is just the protocol that was used at originally, either it was HTTP or HTTPS.
+                * But that's going to come in that other header.
+                */
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+
+                /*
+                * And the next thing we want to do here is to clean up a couple of things that by default are already populated that you don't want them 
+                * populated with default values.
+                */
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            /*
+            * https://learn.dotnetacademy.io/courses/take/net-microservices-cloud/lessons/38615232-forwarding-headers-to-the-identity-microservice
+            * this make sure that the ForwardedHeaders are used at in the request pipeline.
+            */
+            app.UseForwardedHeaders();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
