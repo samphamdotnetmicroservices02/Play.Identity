@@ -305,3 +305,13 @@ export AKS_OIDC_ISSUER="$(az aks show -n $aksName -g "${appname}" --query "oidcI
 
 az identity federated-credential create --name $namespace --identity-name $namespace --resource-group $appname --issuer $AKS_OIDC_ISSUER --subject "system:serviceaccount:${namespace}:${namespace}-serviceaccount" --audience api://AzureADTokenExchange
 ```
+
+## Creating the signing certificate
+```powershell
+kubectl apply -f ./kubernetes/signing-cer.yaml -n $namespace
+
+kubectrl get secret signing-cert -n $namespace -o yaml (get secret from command above, "signing-cert" is the name you defined)
+```
+
+"kubectrl get secret ...": after run this command, it includes data:tls.crt and data:tls.key. So there is a combination of CRT and key files that you can
+use to actually use the certificate for signing purposes.

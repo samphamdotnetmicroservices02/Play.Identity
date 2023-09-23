@@ -1,0 +1,18 @@
+# this purpose of this file is currently we store the key that use to sign for authorization/authentication. Whenever pods crashes, the Kubernetes will recreate
+# a new pod and the key will be produced a new one. So in this time, the key is different. For example if user get the token and use it for get user, for example
+# it work perfectly fine. But sometimes the pod crashes and then recreate a new pod with a new sign key. At which point, the client perfroms get user again
+# but it doesn't work because we have a new key. You can check key at the url https://samphamplayeconomyapigateway.eastus.cloudapp.azure.com/identity-svc/.well-known/openid-configuration/jwks
+# run the command "kubectl get pods -n identity" to get the pod name, delete pod name "kubectl delete pod [pod name] -n identity", run this command to see
+# the Kubernetes recreate a new pod "kubectl get pods -n identity -w ". So to avoid this, we will create this file to store the key.
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: signing-cert
+spec:
+  secretName: signing-cert
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames: 
+    - "samphamplayeconomyapigateway.eastus.cloudapp.azure.com"

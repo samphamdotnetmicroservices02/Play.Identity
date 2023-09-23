@@ -51,6 +51,13 @@ spec:
             # define path base from api gateway (identity-svc, please check Play.Infra)
             - name: IdentitySettings__PathBase
               value: /identity-svc
+
+            # after configuring TLS certificate, this uses for signing key for authen/author
+            - name: IdentitySettings__CertificateCerFilePath
+              value: "/certificates/certificate.crt"
+            - name: IdentitySettings__CertificateKeyFilePath
+              value: "/certificates/certificate.key"
+
             # this is the Kubernetes secrets, after we created secret from Key Vault, we no need the Kubernetes secrets
             # - name: MongoDbSettings__ConnectionString
             #   # valueFrom where we can use secret values
@@ -103,6 +110,35 @@ spec:
               path: /health/ready
               port: 5002
             initialDelaySeconds: 10
+
+          # you can configure this after configuring TLS certificate and the signing-cer.yaml
+          # We need to mount this volume (certificate-volume) into the specific container or containers where we want to use it. VolumeMounts is an array
+          volumeMounts:
+            # The name has to map exactly to the name that you gave to the volume.
+            - name: certificate-volume
+              # And then what is going to be the mount path. So which is the path where the container can reach the values inside this volume. And so with that
+              # our containers or our identity microservice container should be able to find the certificates by looking at /cetificates and then
+              # certificate.key and certificate.crt. But still to make this very flexible and not hard code these paths directly in to the microservice. What we
+              # are going to do is to define a couple of new environment variables.
+              mountPath: /certificates
+      # you can configure this after configuring TLS certificate and the signing-cer.yaml
+      # What we're going to do is to define a volume. We need to define a volume that is going to mouth both that key (tls.crt, tls.key in the "signing-cer.yaml")
+      # that later our microservices is going to use.
+      volumes:
+        # volumes is going to be an array. So each element have to start with the name and the name that we'll give it is just certificate volume.
+        - name: certificate-volume
+          # secret, where we have to define what is a secret that we're going to create the volume from.
+          secret: 
+            # For the secret we have to add secret name and that secret name is going to come from signing-cer.yaml
+            secretName: signing-cert
+            # the items that we want to pull out of that secret, we're going to declare here
+            items:
+              - key: tls.key
+                # the path is going to be whichever path you want to give this file once it has been mounted and the microservice has access to it.
+                path: certificate.key
+              - key: tls.crt
+                # the path is going to be whichever path you want to give this file once it has been mounted and the microservice has access to it.
+                path: certificate.crt
 
 # this "---" is the way you can seperate resources within a single yaml file. You can create another file for this service
 ---
