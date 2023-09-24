@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using GreenPipes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -30,9 +31,11 @@ namespace Play.Identity.Service
     public class Startup
     {
         private const string AllowedOriginSetting = "AllowedOrigin";
-        public Startup(IConfiguration configuration)
+        private readonly IHostEnvironment _environment;
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
             Configuration = configuration;
+            _environment = environment;
         }
 
         public IConfiguration Configuration { get; }
@@ -44,7 +47,7 @@ namespace Play.Identity.Service
             BsonSerializer.RegisterSerializer(new GuidSerializer(BsonType.String));
             var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
             var mongoDbSettings = Configuration.GetSection(nameof(MongoDbSettings)).Get<MongoDbSettings>();
-            var identityServerSettings = Configuration.GetSection(nameof(IdentityServerSettings)).Get<IdentityServerSettings>();
+            
 
             services.Configure<IdentitySettings>(Configuration.GetSection(nameof(IdentitySettings)))
                 .AddDefaultIdentity<ApplicationUser>()
@@ -62,23 +65,7 @@ namespace Play.Identity.Service
                 retryConfigurator.Ignore(typeof(UnknownUserException));
             });
 
-            services.AddIdentityServer(options =>
-                {
-                    // three properties will be helpful when you don't know why IdentityServer does not work properly
-                    // we add three configurations below to see verbose message in the console log and that can help a lot
-                    options.Events.RaiseSuccessEvents = true;
-                    options.Events.RaiseFailureEvents = true;
-                    options.Events.RaiseErrorEvents = true;
-
-                    //This is required in the Docker environment since the strict Linus permissions you'll set there won't allow IdentityServer to crea keys in
-                    //the default /keys directory
-                    options.KeyManagement.KeyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-                })
-                .AddAspNetIdentity<ApplicationUser>()
-                .AddInMemoryApiScopes(identityServerSettings.ApiScopes)
-                .AddInMemoryApiResources(identityServerSettings.ApiResources)
-                .AddInMemoryClients(identityServerSettings.Clients)
-                .AddInMemoryIdentityResources(identityServerSettings.IdentityResources);
+            AddIdentityServer(services);
 
             services.AddLocalApiAuthentication();
 
@@ -120,6 +107,7 @@ namespace Play.Identity.Service
                 options.KnownProxies.Clear();
             });
         }
+
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -179,6 +167,46 @@ namespace Play.Identity.Service
 
                 endpoints.MapPlayEconomyHealthCheck();
             });
+        }
+
+        private void AddIdentityServer(IServiceCollection services)
+        {
+            var identityServerSettings = Configuration.GetSection(nameof(IdentityServerSettings)).Get<IdentityServerSettings>();
+
+            var builder = services.AddIdentityServer(options =>
+            {
+                // three properties will be helpful when you don't know why IdentityServer does not work properly
+                // we add three configurations below to see verbose message in the console log and that can help a lot
+                options.Events.RaiseSuccessEvents = true;
+                options.Events.RaiseFailureEvents = true;
+                options.Events.RaiseErrorEvents = true;
+
+                //This is required in the Docker environment since the strict Linus permissions you'll set there won't allow IdentityServer to crea keys in
+                //the default /keys directory
+                options.KeyManagement.KeyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            })
+            .AddAspNetIdentity<ApplicationUser>()
+            .AddInMemoryApiScopes(identityServerSettings.ApiScopes)
+            .AddInMemoryApiResources(identityServerSettings.ApiResources)
+            .AddInMemoryClients(identityServerSettings.Clients)
+            .AddInMemoryIdentityResources(identityServerSettings.IdentityResources);
+
+            //After configuring TLS certificate, this code base uses for singing key authen/author in production
+            if (!_environment.IsDevelopment())
+            {
+                var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
+
+                /*
+                * read the values of the certificate files in Kubernetes secret
+                * CreateFromPemFile(), remember that this file is being mounted into a directory in the microservice file system. It is being mounted by
+                * Kubernetes. So we want to read it from there.
+                */
+                var cer = X509Certificate2.CreateFromPemFile(
+                    identitySettings.CertificateCerFilePath,
+                    identitySettings.CertificateKeyFilePath
+                );
+                builder.AddSigningCredential(cer);
+            }
         }
     }
 }

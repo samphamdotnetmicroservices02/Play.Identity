@@ -13,4 +13,8 @@ public class IdentitySettings
     * path and that's going to cause a lot of trouble.
     */
     public string PathBase { get; init; }
+
+    //After configuring TLS certificate
+    public string CertificateCerFilePath { get; init; }
+    public string CertificateKeyFilePath { get; init; }
 }
