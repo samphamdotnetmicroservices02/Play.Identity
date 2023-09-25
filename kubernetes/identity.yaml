@@ -58,6 +58,11 @@ spec:
             - name: IdentitySettings__CertificateKeyFilePath
               value: "/certificates/certificate.key"
 
+            - name: IdentityServerSettings__Clients__1__RedirectUris__0
+              value: https://samphamplayeconomyapigateway.eastus.cloudapp.azure.com/authentication/login-callback
+            - name: IdentityServerSettings__Clients__1__PostLogoutRedirectUris__0
+              value: https://samphamplayeconomyapigateway.eastus.cloudapp.azure.com/authentication/logout-callback
+
             # this is the Kubernetes secrets, after we created secret from Key Vault, we no need the Kubernetes secrets
             # - name: MongoDbSettings__ConnectionString
             #   # valueFrom where we can use secret values
