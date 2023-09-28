@@ -15,4 +15,4 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - "play.economy"
+    - "playeconomyapigateway.com"

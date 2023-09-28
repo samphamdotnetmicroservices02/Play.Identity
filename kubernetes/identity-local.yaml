@@ -18,31 +18,10 @@ spec:
             # define path base from api gateway (identity-svc, please check Play.Infra)
             - name: IdentitySettings__PathBase
               value: /identity-svc
-
-            # after configuring TLS certificate, this uses for signing key for authen/author
             - name: IdentitySettings__CertificateCerFilePath
               value: "/certificates/certificate.crt"
             - name: IdentitySettings__CertificateKeyFilePath
               value: "/certificates/certificate.key"
-
-            # this is the Kubernetes secrets, after we created secret from Key Vault, we no need the Kubernetes secrets
-            # - name: MongoDbSettings__ConnectionString
-            #   # valueFrom where we can use secret values
-            #   valueFrom:
-            #     secretKeyRef:
-            #       # identity-screts is the name of secret you create in Kubernetes, pls check README.
-            #       name: identity-secrets
-            #       key: cosmosdb-connectionstring
-            # - name: ServiceBusSetting__ConnectionString
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: identity-secrets
-            #       key: servicebus-connectionstring
-            # - name: IdentitySettings__AdminUserPassword
-            #   valueFrom:
-            #     secretKeyRef:
-            #       name: identity-secrets
-            #       key: admin-password
 
           resources:
             limits:
