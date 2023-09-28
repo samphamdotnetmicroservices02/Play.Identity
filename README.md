@@ -310,7 +310,7 @@ az identity federated-credential create --name $namespace --identity-name $names
 ```powershell
 kubectl apply -f ./kubernetes/signing-cer.yaml -n $namespace
 
-kubectrl get secret signing-cert -n $namespace -o yaml (get secret from command above, "signing-cert" is the name you defined)
+kubectl get secret signing-cert -n $namespace -o yaml (get secret from command above, "signing-cert" is the name you defined)
 ```
 
 "kubectrl get secret ...": after run this command, it includes data:tls.crt and data:tls.key. So there is a combination of CRT and key files that you can
