@@ -192,6 +192,9 @@ and the actual value for the connection string is going to come from the variabl
 ```powershell
 kubectl apply -f ./kubernetes/identity.yaml -n $namespace
 
+kubectl get deploy (get your deployment name)
+kubectl delete deploy identity-deployment -n $namespace (delete deployment if sth went wrong.)
+
 kubectl get pods -n $namespace
 kubectl get pods -n $namespace -w
 READY 1/1: means that we have one container inside the pod, and that one pod is ready
