@@ -13,11 +13,17 @@ spec:
     spec:
       containers:
         - name: identity
-          image: play.identity:1.0.9
+          image: play.identity:1.0.11
           env:
             # define path base from api gateway (identity-svc, please check Play.Infra)
             - name: IdentitySettings__PathBase
               value: /identity-svc
+            - name: RabbitMqSettings__Host
+              value: "172.26.112.1"
+            - name: MongoDbSettings__Host
+              value: "172.26.112.1"
+            - name: IdentitySettings__AdminUserPassword
+              value: Pass@word1
             - name: IdentitySettings__CertificateCerFilePath
               value: "/certificates/certificate.crt"
             - name: IdentitySettings__CertificateKeyFilePath
