@@ -13,21 +13,30 @@ spec:
     spec:
       containers:
         - name: identity
-          image: play.identity:1.0.11
+          image: play.identity:1.0.15
           env:
             # define path base from api gateway (identity-svc, please check Play.Infra)
             - name: IdentitySettings__PathBase
               value: /identity-svc
             - name: RabbitMqSettings__Host
-              value: "172.26.112.1"
+              # for window open command prompt and run "ipconfig", choose IPV4
+              #  value: "172.26.112.1"
+              # for mac open wifi and and click details on your name of wifi you are connecting and check IP address
+              value: "192.168.1.13"
             - name: MongoDbSettings__Host
-              value: "172.26.112.1"
+              # for window open command prompt and run "ipconfig", choose IPV4
+              #  value: "172.26.112.1"
+              # for mac open wifi and and click details on your name of wifi you are connecting and check IP address
+              value: "192.168.1.13"
+            - name: IdentityServerSettings__Clients__1__RedirectUris__0
+              value: http://playeconomyapigateway.com/authentication/login-callback
+            - name: IdentityServerSettings__Clients__1__PostLogoutRedirectUris__0
+              value: http://playeconomyapigateway.com/authentication/logout-callback
             - name: IdentitySettings__AdminUserPassword
               value: Pass@word1
-            - name: IdentitySettings__CertificateCerFilePath
-              value: "/certificates/certificate.crt"
-            - name: IdentitySettings__CertificateKeyFilePath
-              value: "/certificates/certificate.key"
+
+            - name: IdentitySettings__IsKubernetesLocal
+              value: "true"
 
           resources:
             limits:
@@ -47,20 +56,6 @@ spec:
               path: /health/ready
               port: 5002
             initialDelaySeconds: 10
-
-      #     volumeMounts:
-      #       - name: certificate-volume
-      #         mountPath: /certificates
-      # volumes:
-      #   - name: certificate-volume
-      #     secret:
-      #       secretName: signing-cert
-      #       items:
-      #         - key: tls.key
-      #           path: certificate.key
-      #         - key: tls.crt
-      #           path: certificate.crt
-
 ---
 apiVersion: v1
 kind: Service
