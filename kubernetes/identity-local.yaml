@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: identity
-          image: play.identity:1.0.15
+          image: play.identity:1.0.9
           env:
             # define path base from api gateway (identity-svc, please check Play.Infra)
             - name: IdentitySettings__PathBase
@@ -35,7 +35,7 @@ spec:
             - name: IdentitySettings__AdminUserPassword
               value: Pass@word1
 
-            - name: IdentitySettings__IsKubernetesLocal
+            - name: ServiceSettings__IsKubernetesLocal
               value: "true"
 
           resources:

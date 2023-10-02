@@ -77,8 +77,8 @@ namespace Play.Identity.Service
             services.AddHealthChecks()
                 .AddMongoDb();
 
-            var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
-            if (!identitySettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
+            // in local kubernetes, we don't use HTTPS
+            if (!serviceSettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 /*
                 * this is just use for HTTPS
@@ -113,8 +113,8 @@ namespace Play.Identity.Service
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
-            if (!identitySettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
+            var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+            if (!serviceSettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 /*
                 * this is just use for HTTPS
@@ -197,8 +197,8 @@ namespace Play.Identity.Service
             .AddInMemoryClients(identityServerSettings.Clients)
             .AddInMemoryIdentityResources(identityServerSettings.IdentityResources);
 
-            var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
-            if (!identitySettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
+            var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+            if (!serviceSettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 /*
                 * this is just use for HTTPS
@@ -211,6 +211,7 @@ namespace Play.Identity.Service
                     * CreateFromPemFile(), remember that this file is being mounted into a directory in the microservice file system. It is being mounted by
                     * Kubernetes. So we want to read it from there.
                     */
+                    var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
                     var cer = X509Certificate2.CreateFromPemFile(
                         identitySettings.CertificateCerFilePath,
                         identitySettings.CertificateKeyFilePath

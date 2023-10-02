@@ -17,6 +17,4 @@ public class IdentitySettings
     //After configuring TLS certificate
     public string CertificateCerFilePath { get; init; }
     public string CertificateKeyFilePath { get; init; }
-
-    public string IsKubernetesLocal { get; init; } // in local kubernetes, we don't use HTTPS
 }
