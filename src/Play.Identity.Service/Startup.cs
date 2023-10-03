@@ -143,7 +143,29 @@ namespace Play.Identity.Service
             {
                 // for identity service can run behind the api gateway
                 var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
-                context.Request.PathBase = new PathString(identitySettings.PathBase);
+
+                if (context.Request.Path.HasValue && !context.Request.Path.Value.Contains("/health"))
+                {
+                    Console.WriteLine("PATH: " + context.Request.Path);
+                    Console.WriteLine("HOST: " + context.Request.Host);
+                    Console.WriteLine("QUERY: " + context.Request.Query);
+                    Console.WriteLine("QUERYSTRING: " + context.Request.QueryString);
+                    Console.WriteLine("\n");
+                }
+
+                if (context.Request.Host.Value.Contains("identity-service.identity.svc.cluster.local")
+                    && context.Request.Path.HasValue
+                    && context.Request.Path.Value.Contains("/identity-svc/.well-known/openid-configuration/jwks"))
+                {
+                    var newPath = context.Request.Path.Value.Replace("/identity-svc", string.Empty);
+                    Console.WriteLine("NEWPATH: " + newPath);
+                    context.Request.Path = new PathString(newPath);
+                }
+                else
+                {
+                    context.Request.PathBase = new PathString(identitySettings.PathBase);
+                }
+
 
                 return next();
             });
