@@ -200,7 +200,8 @@ namespace Play.Identity.Service
         private void AddIdentityServer(IServiceCollection services)
         {
             var identityServerSettings = Configuration.GetSection(nameof(IdentityServerSettings)).Get<IdentityServerSettings>();
-
+            var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+            
             var builder = services.AddIdentityServer(options =>
             {
                 // three properties will be helpful when you don't know why IdentityServer does not work properly
@@ -212,6 +213,12 @@ namespace Play.Identity.Service
                 //This is required in the Docker environment since the strict Linus permissions you'll set there won't allow IdentityServer to crea keys in
                 //the default /keys directory
                 options.KeyManagement.KeyPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
+                if (serviceSettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
+                {
+                    options.IssuerUri = "http://playeconomyapigateway.com/identity-svc";
+                }
+
             })
             .AddAspNetIdentity<ApplicationUser>()
             .AddInMemoryApiScopes(identityServerSettings.ApiScopes)
@@ -219,7 +226,7 @@ namespace Play.Identity.Service
             .AddInMemoryClients(identityServerSettings.Clients)
             .AddInMemoryIdentityResources(identityServerSettings.IdentityResources);
 
-            var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+
             if (!serviceSettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
             {
                 /*
