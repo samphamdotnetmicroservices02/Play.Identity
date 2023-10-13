@@ -1,0 +1,80 @@
+microserviceName: "identity"
+
+image:
+  repository: samphamplayeconomyacr.azurecr.io/play.identity
+  tag: 1.0.9
+
+# this list of environment variables is just an array. So this is how you define an array in a yaml file. Each of the elements start
+# with dash, and then it has a name and a value for each of the elements in the array. And we could use this syntax if we wanted to
+# extract values from deploying.yaml. However, it is a better practice to instead of using an array, use a dictionary for other each 
+# of these values, just so that in the future, when you want to override or expand one of the values in this list, you can easily 
+# do with new values.yaml files or via other methods. So if each microservice want to define something extra, you can expand the list
+# in that sense. So that would be challenging with an array, but it is toally doable via a dictionary. So, how do we turn this array
+# into a dictionary?
+# envVariables:
+#   - name: ServiceSettings__MessageBroker
+#     value: SERVICEBUS
+#   - name: ServiceSettings__KeyVaultName
+#     value: samphamplayeconomykv
+
+#   - name: IdentitySettings__PathBase
+#     value: /identity-svc
+
+#   - name: IdentitySettings__CertificateCerFilePath
+#     value: "/certificates/certificate.crt"
+#   - name: IdentitySettings__CertificateKeyFilePath
+#     value: "/certificates/certificate.key"
+
+#   - name: IdentityServerSettings__Clients__1__RedirectUris__0
+#     value: https://samphamplayeconomyapigateway.eastus.cloudapp.azure.com/authentication/login-callback
+#   - name: IdentityServerSettings__Clients__1__PostLogoutRedirectUris__0
+#     value: https://samphamplayeconomyapigateway.eastus.cloudapp.azure.com/authentication/logout-callback
+
+# Now we turn array into a dictionary
+envVariables:
+  # "ServiceSettings__MessageBroker" is a key, "SERVICEBUS" is a value
+  ServiceSettings__MessageBroker: SERVICEBUS
+  ServiceSettings__KeyVaultName: samphamplayeconomykv
+  IdentitySettings__PathBase: /identity-svc
+  IdentitySettings__CertificateCerFilePath: "/certificates/certificate.crt"
+  IdentitySettings__CertificateKeyFilePath: "/certificates/certificate.key"
+  IdentityServerSettings__Clients__1__RedirectUris__0: https://samphamplayeconomyapigateway.eastus.cloudapp.azure.com/authentication/login-callback
+  IdentityServerSettings__Clients__1__PostLogoutRedirectUris__0: https://samphamplayeconomyapigateway.eastus.cloudapp.azure.com/authentication/logout-callback
+
+# we expect all microservices has the same memory and cpu, so we define this here
+resources:
+  limits:
+    memory: "128Mi"
+    cpu: "150m"
+
+container:
+  port: 5002
+  liveness:
+    path: /health/live
+    initialDelaySeconds: 10
+  readiness:
+    path: /health/ready
+    initialDelaySeconds: 10
+  volumeMounts:
+    - name: certificate-volume
+      mountPath: /certificates
+
+volumes:
+  - name: certificate-volume
+    secret: 
+      secretName: signing-cert
+      items:
+        - key: tls.key
+          path: certificate.key
+        - key: tls.crt
+          path: certificate.crt
+
+service:
+  type: ClusterIP
+  port: 80
+
+certificate:
+  secretName: signing-cert
+  hostname: samphamplayeconomyapigateway.eastus.cloudapp.azure.com
+
+identityClientId: 85389976-7449-4066-8176-89e472bb343a

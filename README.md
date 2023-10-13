@@ -319,4 +319,9 @@ kubectl get secret signing-cert -n $namespace -o yaml (get secret from command a
 "kubectrl get secret ...": after run this command, it includes data:tls.crt and data:tls.key. So there is a combination of CRT and key files that you can
 use to actually use the certificate for signing purposes.
 
-## Run Kubernetes on local
+## Deploy Kubernetes using Helm chart
+Because we deploy our service to Kubernetes using kubectl, So the first thing is to delete one by one
+
+```
+kubectl delete deployment identity-deployment -n $namespace
+```
