@@ -144,28 +144,19 @@ namespace Play.Identity.Service
                 // for identity service can run behind the api gateway
                 var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
 
-                if (context.Request.Path.HasValue && !context.Request.Path.Value.Contains("/health"))
+                if (serviceSettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
                 {
-                    Console.WriteLine("PATH: " + context.Request.Path);
-                    Console.WriteLine("HOST: " + context.Request.Host);
-                    Console.WriteLine("QUERY: " + context.Request.Query);
-                    Console.WriteLine("QUERYSTRING: " + context.Request.QueryString);
-                    Console.WriteLine("\n");
-                }
-
-                if (context.Request.Host.Value.Contains("identity-service.identity.svc.cluster.local")
+                    if (context.Request.Host.Value.Equals(serviceSettings.InternalHostAuthority, StringComparison.OrdinalIgnoreCase)
                     && context.Request.Path.HasValue
-                    && context.Request.Path.Value.Contains("/identity-svc/.well-known/openid-configuration/jwks"))
-                {
-                    var newPath = context.Request.Path.Value.Replace("/identity-svc", string.Empty);
-                    Console.WriteLine("NEWPATH: " + newPath);
-                    context.Request.Path = new PathString(newPath);
-                }
-                else
-                {
-                    context.Request.PathBase = new PathString(identitySettings.PathBase);
+                    && context.Request.Path.Value.Equals("/identity-svc/.well-known/openid-configuration/jwks", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var newPath = context.Request.Path.Value.Replace("/identity-svc", string.Empty);
+                        context.Request.Path = new PathString(newPath);
+                    }
                 }
 
+                if (!context.Request.Host.Value.Equals(serviceSettings.InternalHostAuthority, StringComparison.OrdinalIgnoreCase))
+                    context.Request.PathBase = new PathString(identitySettings.PathBase);
 
                 return next();
             });
@@ -200,8 +191,9 @@ namespace Play.Identity.Service
         private void AddIdentityServer(IServiceCollection services)
         {
             var identityServerSettings = Configuration.GetSection(nameof(IdentityServerSettings)).Get<IdentityServerSettings>();
+            var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
             var serviceSettings = Configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
-            
+
             var builder = services.AddIdentityServer(options =>
             {
                 // three properties will be helpful when you don't know why IdentityServer does not work properly
@@ -216,7 +208,7 @@ namespace Play.Identity.Service
 
                 if (serviceSettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
                 {
-                    options.IssuerUri = "http://playeconomyapigateway.com/identity-svc";
+                    options.IssuerUri = identitySettings.IdentityIssuerUri;
                 }
 
             })
@@ -240,7 +232,6 @@ namespace Play.Identity.Service
                     * CreateFromPemFile(), remember that this file is being mounted into a directory in the microservice file system. It is being mounted by
                     * Kubernetes. So we want to read it from there.
                     */
-                    var identitySettings = Configuration.GetSection(nameof(IdentitySettings)).Get<IdentitySettings>();
                     var cer = X509Certificate2.CreateFromPemFile(
                         identitySettings.CertificateCerFilePath,
                         identitySettings.CertificateKeyFilePath

@@ -13,11 +13,14 @@ spec:
     spec:
       containers:
         - name: identity
-          image: play.identity:1.0.21
+          image: play.identity:1.0.9
           env:
             # define path base from api gateway (identity-svc, please check Play.Infra)
             - name: IdentitySettings__PathBase
               value: /identity-svc
+            - name: IdentitySettings__IdentityIssuerUri
+              value: http://playeconomyapigateway.com/identity-svc
+
             - name: RabbitMqSettings__Host
               # for window open command prompt and run "ipconfig", choose IPV4
               #  value: "172.26.112.1"
@@ -35,6 +38,8 @@ spec:
             - name: IdentitySettings__AdminUserPassword
               value: Pass@word1
 
+            - name: ServiceSettings__InternalHostAuthority
+              value: identity-service.identity.svc.cluster.local
             - name: ServiceSettings__IsKubernetesLocal
               value: "true"
 
