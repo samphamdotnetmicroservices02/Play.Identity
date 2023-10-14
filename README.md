@@ -386,5 +386,6 @@ or
 helm upgrade indentity-service ./helm -f ./helm/values.yaml -n $namespace --install
 
 helm list -n $namespace
+helm delete <release-name> -n $namespace
 helm repo update
 ```
