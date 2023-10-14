@@ -319,9 +319,31 @@ kubectl get secret signing-cert -n $namespace -o yaml (get secret from command a
 "kubectrl get secret ...": after run this command, it includes data:tls.crt and data:tls.key. So there is a combination of CRT and key files that you can
 use to actually use the certificate for signing purposes.
 
-## Deploy Kubernetes using Helm chart
+## Delete Kubernetes resources if using Helm chart
 Because we deploy our service to Kubernetes using kubectl, So the first thing is to delete one by one
 
 ```
 kubectl delete deployment identity-deployment -n $namespace
+kubectl delete service identity-service -n $namespace
+kubectl delete serviceaccount identity-serviceaccount -n $namespace
+kubectl delete certificate signing-cert -n $namespace
+
+kubectl get all -n $namespace (verify you delete all resources)
 ```
+
+## Install the helm chart
+```powershell
+helm install indentity-service ./helm -f ./helm/values.yaml -n $namespace
+
+helm list -n $namespace
+```
+- helm install indentity-service: "identity-service" is the name you want, this is the name of your release
+- ./helm: the location where you have your chart, which is your helm directory
+- -f ./helm/values.yaml: the value of your helm. Remember that values file is going to override all of the placeholders
+that we have defined directly into the template
+- after run the command above, we will see the result. the "REVISION" from the result is very insteresting because "REVISION"
+is going to keep track of any subsequent installations of this chart for your microservice in the future. So next time you
+run an installation of your microservice via this chart, it will say revision 2, and the revision 3, 4, and so on. And thanks
+to that, you will be able to roll back later on into a previous revision if something is just going wrong with the latest
+version of your microservice. So it's super interesting.
+- helm list -n $namespace: get a list of the installed charts at this point
