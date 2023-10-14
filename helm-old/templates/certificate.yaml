@@ -1,0 +1,18 @@
+# One thing that we want to do with this certificate.yaml file is to introduce one more thing that we have not used just yet,
+# and which is a conditional. Because not all of our microservices are actually going to install certificate. So far it's only
+# our identity microservice that needs a certificate. Otherwise, will not need it. So why define a cetificate for microservices
+# that just don't need them? Because of that, what we're going to do is to add a conditional here that says that if the certificate
+# has been define in the values file then we will go ahead and actually create a certificate in Kubernetes.
+{{- if.Values.certificate }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: "{{.Values.microserviceName}}-cert"
+spec:
+  secretName: {{.Values.certificate.secretName}}
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames: 
+    - {{.Values.certificate.hostname}}
+{{- end }}

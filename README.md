@@ -333,9 +333,20 @@ kubectl get all -n $namespace (verify you delete all resources)
 
 ## Install the helm chart
 ```powershell
-helm install indentity-service ./helm -f ./helm/values.yaml -n $namespace
+$acrName="samphamplayeconomyacr"
+$helmUser=[guid]::Empty.Guid (or helmUser=00000000-0000-0000-0000-000000000000)
+$helmPassword=az acr login --name $acrName --expose-token --output tsv --query accessToken
+$chartVersion="0.1.0"
+
+helm registry login "$acrName.azurecr.io" --username $helmUser --password $helmPassword (login to ACR)
+
+helm upgrade indentity-service oci://$acrName.azurecr.io/helm/microservice --version $chartVersion -f ./helm/values.yaml -n $namespace --install
+helm upgrade indentity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install --debug
+or 
+helm upgrade indentity-service ./helm -f ./helm/values.yaml -n $namespace --install
 
 helm list -n $namespace
+helm repo update
 ```
 - helm install indentity-service: "identity-service" is the name you want, this is the name of your release
 - ./helm: the location where you have your chart, which is your helm directory
@@ -347,3 +358,33 @@ run an installation of your microservice via this chart, it will say revision 2,
 to that, you will be able to roll back later on into a previous revision if something is just going wrong with the latest
 version of your microservice. So it's super interesting.
 - helm list -n $namespace: get a list of the installed charts at this point
+- $helmUser ...: Because we're going to acr, so we don't need to specify which username here. But we need to follow the
+convention, so we put Guid.Empty in the username.
+- $helmPassword ...: get password to login acr, --output tsv: the format from the output "--expose-token" is not approiate 
+to be used as the argument for the next line. So let's actually modify the output a little bit by using the "--output tsv"
+argument. So that it will give you a string that we can use in the next command.
+- --query accessToken: accessToken is one component of that output. So we only get only that piece as a string that we can 
+user later on
+- helm upgrade ... --install: the very first time if you don't have helm chart, it will install, the next time is to upgrade
+the helm chart version.
+- "oci://$acrName.azurecr.io/helm/microservice" is where you push your helm chart to ACR. "--version $chartVersion" is the
+version of your helm chart inside helm/microservice
+- "helm upgrad ... --install --debug": give you more information if upgrading service failed
+- "helm repo update": to make sure that all of your local cache charts are up to date.
+
+```mac
+acrName="samphamplayeconomyacr"
+helmUser=00000000-0000-0000-0000-000000000000
+export helmPassword="$(az acr login --name $acrName --expose-token --output tsv --query accessToken)"
+chartVersion="0.1.0"
+
+helm registry login "$acrName.azurecr.io" --username $helmUser --password $helmPassword (login to ACR)
+
+helm upgrade indentity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install
+helm upgrade indentity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install --debug
+or 
+helm upgrade indentity-service ./helm -f ./helm/values.yaml -n $namespace --install
+
+helm list -n $namespace
+helm repo update
+```

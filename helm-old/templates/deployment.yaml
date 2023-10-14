@@ -1,0 +1,53 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # this property comes from values.yaml file
+  name: "{{.Values.microserviceName}}-deployment"
+spec:
+  selector:
+    matchLabels:
+      app: {{.Values.microserviceName}}
+  template:
+    metadata:
+      labels:
+        app: {{.Values.microserviceName}}
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: "{{.Values.microserviceName}}-serviceaccount"
+      containers:
+        - name: {{.Values.microserviceName}}
+          image: "{{.Values.image.repository}}:{{.Values.image.tag}}"
+          env:
+            # colon is ":", comma is ","
+            # reading value from dictionary. This is syntax to say reading each element on this dictionary of envVariables, and put
+            # each key into this key variables, and each value into this $value variable right there. And then, for each of these
+            # keys and values that you find in there, you're going to place them into a combination of name and value
+            {{- range $key, $value := .Values.envVariables }}
+            - name: {{ $key }}
+              value: {{ $value }}
+            {{- end }}
+          resources:
+            # toYaml is a function that is included in this helm chart language. You need to define the indentation by using "| nindent 12"
+            # 12 is the number of spaces from the left to the line that you define in the yaml, in this case, it would be
+            # "{{- toYaml .Values.resources | nindent 12}}" with 12 spaces leave in the left side. If you don't do this, your value will live
+            # in the first left of the yaml file like the comment below
+#the first left of the file
+            {{- toYaml .Values.resources | nindent 12 }}
+          ports:
+            - containerPort: {{.Values.container.port}}
+
+          livenessProbe:
+            httpGet:
+              path: {{.Values.container.liveness.path}}
+              port: {{.Values.container.port}}
+            initialDelaySeconds: {{.Values.container.liveness.initialDelaySeconds}}
+          readinessProbe:
+            httpGet:
+              path: {{.Values.container.readiness.path}}
+              port: {{.Values.container.port}}
+            initialDelaySeconds: {{.Values.container.readiness.initialDelaySeconds}}
+          volumeMounts:
+            {{- toYaml .Values.container.volumeMounts | nindent 12 }}
+      volumes:
+        {{- toYaml .Values.volumes | nindent 8 }}

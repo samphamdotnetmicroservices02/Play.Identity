@@ -1,0 +1,9 @@
+# api version of helm chart
+apiVersion: v2
+# name of helm chart
+name: microservice
+description: Installs a PlayEconomy microservice
+# version of your chart, so anytime you make any changes to this chart (certificate.yaml, deployment.yaml, service.yaml, serviceaccount.yaml, ...)
+# if we change the structure of any of our files here, you should bump this version, so that the helm tool understands that this is a brand new
+# version of the chart.
+version: 0.1.0

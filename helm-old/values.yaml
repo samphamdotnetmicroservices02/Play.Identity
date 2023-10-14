@@ -6,8 +6,8 @@ image:
 
 # this list of environment variables is just an array. So this is how you define an array in a yaml file. Each of the elements start
 # with dash, and then it has a name and a value for each of the elements in the array. And we could use this syntax if we wanted to
-# extract values from deploying.yaml. However, it is a better practice to instead of using an array, use a dictionary for other each
-# of these values, just so that in the future, when you want to override or expand one of the values in this list, you can easily
+# extract values from deploying.yaml. However, it is a better practice to instead of using an array, use a dictionary for other each 
+# of these values, just so that in the future, when you want to override or expand one of the values in this list, you can easily 
 # do with new values.yaml files or via other methods. So if each microservice want to define something extra, you can expand the list
 # in that sense. So that would be challenging with an array, but it is toally doable via a dictionary. So, how do we turn this array
 # into a dictionary?
@@ -33,34 +33,45 @@ image:
 # Now we turn array into a dictionary
 envVariables:
   # "ServiceSettings__MessageBroker" is a key, "SERVICEBUS" is a value
+  ServiceSettings__MessageBroker: SERVICEBUS
+  ServiceSettings__KeyVaultName: samphamplayeconomykv
   IdentitySettings__PathBase: /identity-svc
   IdentitySettings__CertificateCerFilePath: "/certificates/certificate.crt"
   IdentitySettings__CertificateKeyFilePath: "/certificates/certificate.key"
   IdentityServerSettings__Clients__1__RedirectUris__0: https://samphamplayeconomyapigateway.eastus.cloudapp.azure.com/authentication/login-callback
   IdentityServerSettings__Clients__1__PostLogoutRedirectUris__0: https://samphamplayeconomyapigateway.eastus.cloudapp.azure.com/authentication/logout-callback
 
-# we expect all microservices has the same memory and cpu, so we define this here. Actually, identity service will need a bit
-# more resources than other services. So keep this section here but also bump memory and CPU values to this.
+# we expect all microservices has the same memory and cpu, so we define this here
 resources:
   limits:
-    memory: "256Mi"
-    cpu: "300m"
+    memory: "128Mi"
+    cpu: "150m"
 
 container:
   port: 5002
+  liveness:
+    path: /health/live
+    initialDelaySeconds: 10
+  readiness:
+    path: /health/ready
+    initialDelaySeconds: 10
   volumeMounts:
     - name: certificate-volume
       mountPath: /certificates
 
 volumes:
   - name: certificate-volume
-    secret:
+    secret: 
       secretName: signing-cert
       items:
         - key: tls.key
           path: certificate.key
         - key: tls.crt
           path: certificate.crt
+
+service:
+  type: ClusterIP
+  port: 80
 
 certificate:
   secretName: signing-cert
