@@ -49,7 +49,7 @@ the "." next to $version is the cecil file , the context for this docker build c
 is just going to be ".", this "." represents the current directory
 ```
 
-```mac
+```zsh
 export GH_OWNER="samphamdotnetmicroservices02"
 export GH_PAT="[PAT HERE]"
 acrName="samphamplayeconomyacr"
@@ -108,7 +108,7 @@ where all the other containers are running "playinfra_default (RabbitMq and Mong
 And lawtly we have to specify the docker image that we want to run (play.identity:$version)
 ```
 
-```mac
+```zsh
 adminPass="[PASSWORD HERE]"
 cosmosDbConnString="[CONN STRING HERE]"
 serviceBusConnString="[CONN STRING HERE]"
@@ -144,7 +144,7 @@ and the accurate repository name (samphamplayeconomyacr.azurecr.io/play.identity
 docker push: publishing image
 ```
 
-```mac
+```zsh
 acrName="samphamplayeconomyacr"
 
 az acr login --name $acrName
@@ -165,7 +165,7 @@ namespace: the namespace is nothing more than a way to separate the resources th
 you will have one namespace paired microservice in this case, we will put all the resources that belong to that specific microservice.
 ```
 
-```mac
+```zsh
 namespace="identity"
 kubectl create namespace $namespace
 ```
@@ -268,7 +268,7 @@ It could be cetificates, it could be keys or it could be secrets. In this case i
 "--spn $IDENTITY_CLIENT_ID" And then the identity or the service principle that we want to grant these permissions into, is going to be our identity clientId
 ```
 
-```mac
+```zsh
 appname="playeconomy"
 keyVaultName="samphamplayeconomykv"
 
@@ -302,7 +302,7 @@ az identity federated-credential... --subject: your service account that you jus
 "system:serviceaccount:${namespace}:${namespace}-serviceaccount", the first $namespace, general case is just identity, and the second $namespace is the actual name of the service account which lives in kubernetes/identity.yaml and the ${namespace}-serviceaccount lives in $namespace (identity)
 ```
 
-```mac
+```zsh
 aksName="samphamplayeconomyaks"
 export AKS_OIDC_ISSUER="$(az aks show -n $aksName -g "${appname}" --query "oidcIssuerProfile.issuerUrl" -otsv)"
 
@@ -372,7 +372,7 @@ version of your helm chart inside helm/microservice
 - "helm upgrad ... --install --debug": give you more information if upgrading service failed
 - "helm repo update": to make sure that all of your local cache charts are up to date.
 
-```mac
+```zsh
 acrName="samphamplayeconomyacr"
 helmUser=00000000-0000-0000-0000-000000000000
 export helmPassword="$(az acr login --name $acrName --expose-token --output tsv --query accessToken)"
