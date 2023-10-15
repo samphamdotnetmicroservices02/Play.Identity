@@ -66,3 +66,23 @@ jobs:
         -o packages
     - name: Publish
       run: dotnet nuget push packages/*.nupkg
+
+  build-and-deploy-service:
+    runs-on: ubuntu-latest
+    needs: generate-version
+
+    env:
+      ACR_NAME: samphamplayeconomyacr
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5.0.0
+        with:
+          # for GH_PAT, we cannot use secrets.GITHUB_TOKEN, because we will use Play.Common, and it belongs to
+          # another repository, not in this repository
+          secrets: | 
+            "GH_OWNER=${{github.repository_owner}}"
+            "GH_PAT=${{secrets.GH_PAT}}"
+          tags: ${{env.ACR_NAME}}.azurecr.io/play.identity:${{ needs.generate-version.outputs.new_version }}
