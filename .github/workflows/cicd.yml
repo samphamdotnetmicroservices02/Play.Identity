@@ -62,7 +62,7 @@ jobs:
         dotnet pack src/Play.Identity.Contracts/ \
         --configuration Release \
         -p:PackageVersion=${{ needs.generate-version.outputs.new_version }} \
-        -p:RepositoryUrl=https://github.com/{{github.repository_owner}}/Play.Identity \
+        -p:RepositoryUrl=https://github.com/${{github.repository_owner}}/Play.Identity \
         -o packages
     - name: Publish
       run: dotnet nuget push packages/*.nupkg
