@@ -18,7 +18,7 @@ dotnet nuget push ..\packages\Play.Identity.Contracts.$version.nupkg --api-key $
 --source "github" comes from Play.Infra
 ```
 
-```mac
+```zsh
 version="1.0.9"
 owner="samphamdotnetmicroservices02"
 gh_pat="[PAT HERE]"
