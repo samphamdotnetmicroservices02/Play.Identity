@@ -73,9 +73,33 @@ jobs:
 
     env:
       ACR_NAME: samphamplayeconomyacr
+
+    # The way we're going to enable authentication from Github into Azure is by following the OpenId Connect framework
+    # which is now supported by Github. And as part of this framework, what needs to be created is an Id token. That's
+    # going to have all the permissions necessary for the Github actions to interact with Azure.
+    permissions:
+      # this id-token: write allows for the actual creation and writing into the ID token that's going to be generated.
+      # So you need to specify here or nothing else is going to work.
+      id-token: write
+      # this allows is for the access token to be able to actually read and clone contents of our GitHub repository.
+      contents: read
     
     steps:
       - uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: Azure/login@v1.4.6
+        with:
+          # Client-id is the id we just created service principal. Navigating to Microsoft Entra ID (Azure Active Directory),
+          # --> App Registrations --> at the "GitHub" row, copy the value at the column "Application (client) ID" and paste here
+          # But this value should store in secrets.
+          client-id: ${{secrets.AZURE_CLIENT_ID}}
+          # the tenant-id is it refers directly to the ID of the active directory organization that has been created for your Azure
+          # account. Navigating to Microsoft Entra ID (Azure Active Directory), Tenant ID will be displayed here.
+          tenant-id: ${{secrets.AZURE_TENANT_ID}}
+          # subscription-id: navigating to your subscription and selecting subscritionId
+          subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
+          
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v5.0.0
