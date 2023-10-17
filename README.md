@@ -7,7 +7,7 @@ dotnet nuget remove source [Name of your link of package you want to remove]
 
 ## Create and publish package
 ```powershell
-$version="1.0.9"
+$version="1.0.14"
 $owner="samphamdotnetmicroservices02"
 $gh_pat="[PAT HERE]"
 
@@ -19,7 +19,7 @@ dotnet nuget push ..\packages\Play.Identity.Contracts.$version.nupkg --api-key $
 ```
 
 ```zsh
-version="1.0.9"
+version="1.0.14"
 owner="samphamdotnetmicroservices02"
 gh_pat="[PAT HERE]"
 
@@ -336,7 +336,7 @@ kubectl get all -n $namespace (verify you delete all resources)
 $acrName="samphamplayeconomyacr"
 $helmUser=[guid]::Empty.Guid (or helmUser=00000000-0000-0000-0000-000000000000)
 $helmPassword=az acr login --name $acrName --expose-token --output tsv --query accessToken
-$chartVersion="0.1.0"
+$chartVersion="0.1.1"
 
 helm registry login "$acrName.azurecr.io" --username $helmUser --password $helmPassword (login to ACR)
 
@@ -347,6 +347,7 @@ helm upgrade identity-service ./helm -f ./helm/values.yaml -n $namespace --insta
 
 helm list -n $namespace
 helm repo update
+helm delete identity-service -n $namespace
 ```
 - helm install identity-service: "identity-service" is the name you want, this is the name of your release
 - ./helm: the location where you have your chart, which is your helm directory
@@ -376,17 +377,17 @@ version of your helm chart inside helm/microservice
 acrName="samphamplayeconomyacr"
 helmUser=00000000-0000-0000-0000-000000000000
 export helmPassword="$(az acr login --name $acrName --expose-token --output tsv --query accessToken)"
-chartVersion="0.1.0"
+chartVersion="0.1.1"
 
 helm registry login "$acrName.azurecr.io" --username $helmUser --password $helmPassword (login to ACR)
 
-helm upgrade identity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install
-helm upgrade identity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install --debug
+helm upgrade identity-service oci://$acrName.azurecr.io/helm/microservice --version $chartVersion -f ./helm/values.yaml -n $namespace --install
+helm upgrade identity-service oci://$acrName.azurecr.io/helm/microservice --version $chartVersion -f ./helm/values.yaml -n $namespace --install --debug
 or 
 helm upgrade identity-service ./helm -f ./helm/values.yaml -n $namespace --install
 
 helm list -n $namespace
-helm delete <release-name> -n $namespace
+helm delete identity-service -n $namespace
 helm repo update
 ```
 
