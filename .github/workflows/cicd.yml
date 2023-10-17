@@ -89,6 +89,7 @@ jobs:
 
       - name: Azure Login
         uses: Azure/login@v1.4.6
+        # Log in to Azure using OIDC
         with:
           # Client-id is the id we just created service principal. Navigating to Microsoft Entra ID (Azure Active Directory),
           # --> App Registrations --> at the "GitHub" row, copy the value at the column "Application (client) ID" and paste here
@@ -100,6 +101,8 @@ jobs:
           # subscription-id: navigating to your subscription and selecting subscritionId
           subscription-id: ${{secrets.AZURE_SUBSCRIPTION_ID}}
           
+      - name: Login to Container Registry
+        run: az acr login --name ${{env.ACR_NAME}}
       
       - name: Build and push Docker image
         uses: docker/build-push-action@v5.0.0
@@ -110,3 +113,4 @@ jobs:
             "GH_OWNER=${{github.repository_owner}}"
             "GH_PAT=${{secrets.GH_PAT}}"
           tags: ${{env.ACR_NAME}}.azurecr.io/play.identity:${{ needs.generate-version.outputs.new_version }}
+          push: true
