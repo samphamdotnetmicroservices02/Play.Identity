@@ -115,7 +115,7 @@ jobs:
           secrets: | 
             "GH_OWNER=${{github.repository_owner}}"
             "GH_PAT=${{secrets.GH_PAT}}"
-          tags: ${{env.ACR_NAME}}.azurecr.io/play.identity:${{ needs.generate-version.outputs.new_version }}
+          tags: ${{env.ACR_NAME}}.azurecr.io/play.${{env.SERVICE_NAME}}:${{ needs.generate-version.outputs.new_version }}
           push: true
 
       - name: Get AKS Credentials
