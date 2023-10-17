@@ -340,15 +340,15 @@ $chartVersion="0.1.0"
 
 helm registry login "$acrName.azurecr.io" --username $helmUser --password $helmPassword (login to ACR)
 
-helm upgrade indentity-service oci://$acrName.azurecr.io/helm/microservice --version $chartVersion -f ./helm/values.yaml -n $namespace --install
-helm upgrade indentity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install --debug
+helm upgrade identity-service oci://$acrName.azurecr.io/helm/microservice --version $chartVersion -f ./helm/values.yaml -n $namespace --install
+helm upgrade identity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install --debug
 or 
-helm upgrade indentity-service ./helm -f ./helm/values.yaml -n $namespace --install
+helm upgrade identity-service ./helm -f ./helm/values.yaml -n $namespace --install
 
 helm list -n $namespace
 helm repo update
 ```
-- helm install indentity-service: "identity-service" is the name you want, this is the name of your release
+- helm install identity-service: "identity-service" is the name you want, this is the name of your release
 - ./helm: the location where you have your chart, which is your helm directory
 - -f ./helm/values.yaml: the value of your helm. Remember that values file is going to override all of the placeholders
 that we have defined directly into the template
@@ -380,10 +380,10 @@ chartVersion="0.1.0"
 
 helm registry login "$acrName.azurecr.io" --username $helmUser --password $helmPassword (login to ACR)
 
-helm upgrade indentity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install
-helm upgrade indentity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install --debug
+helm upgrade identity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install
+helm upgrade identity-service oci://$acrName.azurecr.io/helm/microservice -f ./helm/values.yaml -n $namespace --install --debug
 or 
-helm upgrade indentity-service ./helm -f ./helm/values.yaml -n $namespace --install
+helm upgrade identity-service ./helm -f ./helm/values.yaml -n $namespace --install
 
 helm list -n $namespace
 helm delete <release-name> -n $namespace
@@ -394,10 +394,10 @@ helm repo update
 https://helm.sh/docs/helm/helm_rollback/
 
 ```powershell
-helm history indentity-service -n $namespace (check your all revision numbers)
-helm rollback indentity-service -n $namespace (if you dont specify the revision number here, it will roll back to previous number)
+helm history identity-service -n $namespace (check your all revision numbers)
+helm rollback identity-service -n $namespace (if you dont specify the revision number here, it will roll back to previous number)
 or 
-helm rollback indentity-service [REVISION] -n $namespace
+helm rollback identity-service [REVISION] -n $namespace
 ```
 
 When you roll back, helm will also increase your a number for revision
