@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
-using GreenPipes;
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
