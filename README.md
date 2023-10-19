@@ -7,7 +7,7 @@ dotnet nuget remove source [Name of your link of package you want to remove]
 
 ## Create and publish package
 ```powershell
-$version="1.0.14"
+$version="1.0.20"
 $owner="samphamdotnetmicroservices02"
 $gh_pat="[PAT HERE]"
 
@@ -19,7 +19,7 @@ dotnet nuget push ..\packages\Play.Identity.Contracts.$version.nupkg --api-key $
 ```
 
 ```zsh
-version="1.0.14"
+version="1.0.20"
 owner="samphamdotnetmicroservices02"
 gh_pat="[PAT HERE]"
 
@@ -336,7 +336,7 @@ kubectl get all -n $namespace (verify you delete all resources)
 $acrName="samphamplayeconomyacr"
 $helmUser=[guid]::Empty.Guid (or helmUser=00000000-0000-0000-0000-000000000000)
 $helmPassword=az acr login --name $acrName --expose-token --output tsv --query accessToken
-$chartVersion="0.1.1"
+$chartVersion="0.1.2"
 
 helm registry login "$acrName.azurecr.io" --username $helmUser --password $helmPassword (login to ACR)
 
@@ -377,7 +377,7 @@ version of your helm chart inside helm/microservice
 acrName="samphamplayeconomyacr"
 helmUser=00000000-0000-0000-0000-000000000000
 export helmPassword="$(az acr login --name $acrName --expose-token --output tsv --query accessToken)"
-chartVersion="0.1.1"
+chartVersion="0.1.2"
 
 helm registry login "$acrName.azurecr.io" --username $helmUser --password $helmPassword (login to ACR)
 
