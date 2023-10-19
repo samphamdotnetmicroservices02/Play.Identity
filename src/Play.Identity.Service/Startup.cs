@@ -17,6 +17,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using Play.Common.HealthChecks;
 using Play.Common.Logging;
 using Play.Common.MassTransit;
+using Play.Common.OpenTelemetry;
 using Play.Common.Settings;
 using Play.Identity.Service.Entities;
 using Play.Identity.Service.Exceptions;
@@ -78,7 +79,8 @@ namespace Play.Identity.Service
             services.AddHealthChecks()
                 .AddMongoDb();
             
-            services.AddSeqLogging(Configuration);
+            services.AddSeqLogging(Configuration)
+                .AddTracing(Configuration);
 
             // in local kubernetes, we don't use HTTPS
             if (!serviceSettings.IsKubernetesLocal.Equals("true", StringComparison.OrdinalIgnoreCase))
