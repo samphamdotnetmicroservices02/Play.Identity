@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using AspNetCore.Identity.MongoDbCore.Models;
 using MongoDbGenericRepository.Attributes;
 

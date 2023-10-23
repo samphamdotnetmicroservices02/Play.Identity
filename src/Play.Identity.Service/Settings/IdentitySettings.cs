@@ -2,8 +2,8 @@ namespace Play.Identity.Service.Settings;
 
 public class IdentitySettings
 {
-    public string AdminUserEmail { get; init; }
-    public string AdminUserPassword { get; init; }
+    public required string AdminUserEmail { get; init; }
+    public required string AdminUserPassword { get; init; }
     public decimal StartingGil { get; init; }
 
     /*
@@ -12,11 +12,11 @@ public class IdentitySettings
     * otherwise all the URLs that it will define for all OAuth and OpenId Connect purposes are not going to be correct. They will missing this 
     * path and that's going to cause a lot of trouble.
     */
-    public string PathBase { get; init; }
+    public required string PathBase { get; init; }
 
     //After configuring TLS certificate
-    public string CertificateCerFilePath { get; init; }
-    public string CertificateKeyFilePath { get; init; }
+    public required string CertificateCerFilePath { get; init; }
+    public required string CertificateKeyFilePath { get; init; }
 
     public string IdentityIssuerUri { get; init; } = string.Empty;
 }

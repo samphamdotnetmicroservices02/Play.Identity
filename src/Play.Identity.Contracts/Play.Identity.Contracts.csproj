@@ -3,7 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <PackageDescription>Contracts supported by Identity microservice</PackageDescription>
+    <Authors>Sam Pham</Authors>
+    <Company>Sam Pham company</Company>
   </PropertyGroup>
 
 </Project>

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -40,7 +36,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<UserDto>> GetByIdAsync(Guid id)
+    public async Task<ActionResult<UserDto?>> GetByIdAsync(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
 
@@ -49,7 +45,7 @@ public class UserController : ControllerBase
             return NotFound();
         }
 
-        return user.AsDto();
+        return user!.AsDto();
     }
 
     [HttpPut("{id}")]

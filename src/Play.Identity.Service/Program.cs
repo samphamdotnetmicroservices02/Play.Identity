@@ -1,22 +1,13 @@
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Builder;
 using Play.Common.Configurations;
+using Play.Identity.Service;
 
-namespace Play.Identity.Service
-{
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
+var builder = WebApplication.CreateBuilder(args);
+builder.Host.ConfigureAzureKeyVault();
+builder.Services.AddServices(builder.Configuration, builder.Environment);
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureAzureKeyVault()
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-}
+var app = builder.Build();
+
+app.ConfigurePipeline(app.Configuration, app.Environment);
+
+app.Run();

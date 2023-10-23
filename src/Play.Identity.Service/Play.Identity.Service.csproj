@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
+
+    <!-- By doing this, we are stating that we want to be signaling the compiler that we want to be very explicit about the usage -->
+    <!-- of null across our code base so that will very lightly start spinning up a bunch of warnings or even errors across your code base -->
+    <Nullable>enable</Nullable>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+
     <UserSecretsId>0986b465-a40d-46b0-b0fe-d8cbf2b44631</UserSecretsId>
   </PropertyGroup>
 

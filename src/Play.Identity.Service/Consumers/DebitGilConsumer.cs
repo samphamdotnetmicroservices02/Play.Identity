@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.Metrics;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using MassTransit;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Play.Common.Settings;
 using Play.Identity.Contracts;
 using Play.Identity.Service.Entities;
@@ -31,6 +25,7 @@ public class DebitGilConsumer : IConsumer<DebitGil>
         * you'll have at least one Meter that owns everything related to metrics in your microservice.
         */
         var settings = configuration.GetSection(nameof(ServiceSettings)).Get<ServiceSettings>();
+        ArgumentNullException.ThrowIfNull(settings);
         Meter meter = new(settings.ServiceName);
         _gilDebitedCounter = meter.CreateCounter<int>("GilDebited");
     }
@@ -51,6 +46,8 @@ public class DebitGilConsumer : IConsumer<DebitGil>
         {
             throw new UnknownUserException(message.UserId);
         }
+
+        ArgumentNullException.ThrowIfNull(context.MessageId); // boxing
 
         if (user.MessageIds.Contains(context.MessageId.Value))
         {
@@ -74,7 +71,7 @@ public class DebitGilConsumer : IConsumer<DebitGil>
 
         await _userManager.UpdateAsync(user);
 
-        _gilDebitedCounter.Add(1, new KeyValuePair<string, object>(nameof(message.Gil), message.Gil)); // boxing ItemId to object
+        _gilDebitedCounter.Add(1, new KeyValuePair<string, object?>(nameof(message.UserId), message.UserId)); // boxing ItemId to object
 
         var gilDebitedTask = context.Publish(new GilDebited(message.CorrelationId));
         var userUpdatedTask = context.Publish(new UserUpdated(user.Id, user.Email, user.Gil));

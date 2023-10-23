@@ -2,14 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Threading.Tasks;
 using Duende.IdentityServer.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 using Play.Identity.Service.Entities;
 
 namespace Play.Identity.Service.Areas.Identity.Pages.Account
@@ -20,8 +16,8 @@ namespace Play.Identity.Service.Areas.Identity.Pages.Account
         private readonly ILogger<LogoutModel> _logger;
         private readonly IIdentityServerInteractionService _interaction;
 
-        public LogoutModel(SignInManager<ApplicationUser> signInManager, 
-            ILogger<LogoutModel> logger, 
+        public LogoutModel(SignInManager<ApplicationUser> signInManager,
+            ILogger<LogoutModel> logger,
             IIdentityServerInteractionService interaction)
         {
             _signInManager = signInManager;

@@ -1,8 +1,4 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Play.Identity.Service.Entities;
 using Play.Identity.Service.Settings;
